@@ -11,6 +11,8 @@ El changelog del espacio de trabajo (Notion, Jira, Confluence) es otro: 📜 CHA
 - KAN-25: workflow de GitHub Pages protegido contra salidas incompletas y `infra/scripts/build-site.sh`; plantillas de Pull Request e issues, `.gitignore`, `.gitattributes` y `.editorconfig`.
 - KAN-25: documentación en `docs/`: estructura, apps móviles (regla de dos capas), despliegue y registro de decisiones.
 - KAN-24: `AGENTS.md` como punto de entrada único para cualquier agente de IA (`CLAUDE.md` lo importa); remite a las skills locales si existen.
+- KAN-14: portal mínimo en `web/portal` (React + Vite): lista los métodos de estudio; Montessori enlaza a su prototipo y Pomodoro, Kaizen y «Por definir» aparecen como «Próximamente». Lista en `src/methods.js` con pruebas.
+- KAN-14: prototipo Montessori (v0.5.13) en `apps/prototypes/montessori`: ambiente de estudio responsive con escritorio, bandeja, sesión con cronómetro, herramientas y guardado local. Incluye 54 pruebas de lógica.
 - Este `CHANGELOG.md`.
 
 ### Cambiado

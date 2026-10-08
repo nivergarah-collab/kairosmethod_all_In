@@ -3,7 +3,7 @@
 | Qué | Cuándo | Cómo | Workflow |
 |---|---|---|---|
 | Verificación de Pull Request | En cada PR | Prueba manual documentada mientras no haya CI útil | Sin workflow activo |
-| Sitio web (portal + prototipos base) | Después de crear/enlazar repo y completar el portal y sus prototipos enlazados | GitHub Pages | `deploy-pages.yml` (preparado y protegido; aún no publicar) |
+| Sitio web (portal + prototipos base) | Después de crear/enlazar repo y completar el portal y sus prototipos enlazados | GitHub Pages | `deploy-pages.yml` (protegido; publica al configurar `PAGES_REQUIRED_PROTOTYPES=montessori`) |
 | Apk de `student` (Capacitor) | Futuro, al implementar app y configuración | Por definir | Sin workflow activo |
 | Imagen Docker del backend | Futuro, cuando haya backend, Dockerfile y destino elegido | Por definir | Sin workflow activo |
 | Release de apk firmado | Futuro (tag de versión) | GitHub Releases | pendiente |
@@ -21,11 +21,12 @@
 
 1. Crear y enlazar el repo público en GitHub (sin organización); configurar Pages con **GitHub Actions** cuando corresponda.
 2. Proteger `main` con PR obligatorio. No exigir un check de CI mientras no exista un workflow de CI útil.
-3. Añadir y enlazar el portal mínimo y los prototipos base elegidos; Pages publicará al cumplirse las guardas descritas arriba.
+3. Crear la variable de Actions `PAGES_REQUIRED_PROTOTYPES` con `montessori` (hoy el portal mínimo y Montessori ya están en el repo, enlazados); Pages publicará al cumplirse las guardas descritas arriba.
 
 ## Pendiente
 
-- Implementar portal y prototipos base para la primera publicación en Pages.
+- Configurar Pages y `PAGES_REQUIRED_PROTOTYPES` para la primera publicación (portal mínimo y Montessori ya implementados).
+- Implementar Pomodoro y Kaizen; mientras tanto el portal los muestra como «Próximamente».
 - Implementar `student`, Capacitor y su build de Android.
 - Apk del docente: por confirmar con su estructura.
 - Backend, base de datos, destino Docker y despliegue de fase posterior.
