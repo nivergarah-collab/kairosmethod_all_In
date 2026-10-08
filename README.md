@@ -10,10 +10,10 @@ El repositorio será **público y colaborativo**, sin organización de GitHub ni
 
 | Carpeta | Contenido | Estado |
 |---|---|---|
-| `apps/prototypes/<método>` | Prototipos aislados (pomodoro, montessori, kaizen): un proyecto React responsive cada uno, solo web | Vacío |
+| `apps/prototypes/<método>` | Prototipos aislados (pomodoro, montessori, kaizen): un proyecto React responsive cada uno, solo web | Montessori listo; Pomodoro y Kaizen vacíos |
 | `apps/student` | App del estudiante; el apk con Capacitor es una posibilidad futura | Vacío |
 | `apps/teacher/{web,mobile}` | App del docente (estructura por confirmar; apk futura) | Vacío |
-| `web/portal` | Índice que enlaza a los prototipos; luego, el dashboard real | Vacío |
+| `web/portal` | Índice de métodos: enlaza a los prototipos habilitados y marca el resto como «Próximamente»; luego, el dashboard real | Base |
 | `services/backend` | Java + Spring Boot | Futuro |
 | `db` | Base relacional con soporte JSON | Futuro |
 | `infra` | Script de build de Pages y espacio reservado para Docker futuro | Base |
