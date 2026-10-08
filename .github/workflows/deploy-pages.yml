@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: BASE_PATH="/${GITHUB_REPOSITORY#*/}" REQUIRED_PROTOTYPES="$REQUIRED_PROTOTYPES" ./infra/scripts/build-site.sh
+      - run: BASE_PATH="/${GITHUB_REPOSITORY#*/}" REQUIRED_PROTOTYPES="$REQUIRED_PROTOTYPES" bash ./infra/scripts/build-site.sh
         env:
           REQUIRED_PROTOTYPES: ${{ vars.PAGES_REQUIRED_PROTOTYPES }}
       - name: Verify Pages artifact is complete
