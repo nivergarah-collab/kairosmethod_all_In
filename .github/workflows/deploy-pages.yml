@@ -1,0 +1,53 @@
+# Preparado para publicar portal + prototipos web al estar implementados y enlazados.
+# Requiere: Settings > Pages > Source = "GitHub Actions" (el repo debe ser público en plan gratuito).
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/portal/**'
+      - '!web/portal/README.md'
+      - 'apps/prototypes/**'
+      - '!apps/prototypes/**/README.md'
+      - 'infra/scripts/build-site.sh'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: ${{ vars.PAGES_REQUIRED_PROTOTYPES != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: BASE_PATH="/${GITHUB_REPOSITORY#*/}" REQUIRED_PROTOTYPES="$REQUIRED_PROTOTYPES" ./infra/scripts/build-site.sh
+        env:
+          REQUIRED_PROTOTYPES: ${{ vars.PAGES_REQUIRED_PROTOTYPES }}
+      - name: Verify Pages artifact is complete
+        run: test -s dist/index.html && test -d dist/prototypes
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    if: ${{ vars.PAGES_REQUIRED_PROTOTYPES != '' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

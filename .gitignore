@@ -1,0 +1,38 @@
+# Dependencias y builds
+node_modules/
+dist/
+build/
+.next/
+coverage/
+*.log
+
+# Java / Gradle / Android
+.gradle/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+captures/
+.cxx/
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Editores y SO
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Skills de agentes: su fuente está en allinchile-anexos; Notion mantiene un espejo.
+# No se publican dentro de este repo.
+skills/
+skills*.zip
+.claude/skills/
