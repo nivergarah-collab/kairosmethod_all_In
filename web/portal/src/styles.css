@@ -1,0 +1,49 @@
+:root {
+  --bg: #f6f1e6;
+  --ink: #24211d;
+  --muted: #5d574c;
+  --accent: #2f6f57;
+  --accent-ink: #fff;
+  --card: #fffdf8;
+  --line: #ddd4c2;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--ink);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d1b18;
+    --ink: #efe9dc;
+    --muted: #b9b1a0;
+    --accent: #6fbf9f;
+    --accent-ink: #14110e;
+    --card: #28251f;
+    --line: #3e3a31;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+h1, h2, p, ul { margin: 0; }
+ul { list-style: none; padding: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid #4aa3ff; outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.page { min-height: 100dvh; max-width: 62rem; margin: 0 auto; padding: 48px 16px 32px; display: flex; flex-direction: column; gap: 32px; }
+.hero { display: grid; gap: 10px; }
+.eyebrow { font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1 { font-size: clamp(2rem, 6vw, 3.25rem); line-height: 1.05; }
+.lead { max-width: 40rem; color: var(--muted); font-size: 1.05rem; line-height: 1.5; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 16px; }
+.card { height: 100%; display: flex; flex-direction: column; gap: 8px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); text-decoration: none; }
+.card-name { font-size: 1.25rem; font-weight: 700; }
+.card-summary { color: var(--muted); line-height: 1.45; flex: 1; }
+.card-action { color: var(--accent); font-weight: 600; }
+.card-badge { align-self: flex-start; padding: 3px 12px; border: 1px dashed var(--line); border-radius: 999px; font-size: .8rem; color: var(--muted); }
+.is-available { border-color: var(--accent); transition: transform .15s, box-shadow .15s; }
+.is-available:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, .12); }
+.is-soon { opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .is-available { transition: none; } .is-available:hover { transform: none; } }
+
+.foot { margin-top: auto; font-size: .9rem; color: var(--muted); }

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="KairosMethod: espacio de estudio para enseñanza media basado en métodos de estudio validados." />
+    <meta name="theme-color" content="#1d1b18" />
+    <link rel="icon" href="data:," />
+    <title>KairosMethod · Métodos de estudio</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Respaldo sin JavaScript. Solo los métodos habilitados; debe coincidir con src/methods.js
+         (lo comprueba src/methods.test.js). %BASE_URL% lo reemplaza Vite con la base del build. -->
+    <noscript>
+      <p>Este portal necesita JavaScript. Prototipos habilitados:</p>
+      <ul>
+        <li><a href="%BASE_URL%prototypes/montessori/">Montessori</a></li>
+      </ul>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
