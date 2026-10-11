@@ -12,6 +12,7 @@ Las skills del proyecto **no están en este repo público**. Su fuente es la car
 ## Reglas clave del repo
 
 - Una vez creado el repo GitHub, proteger `main`: nada se sube directo, todo entra por Pull Request. Esa regla aún no está configurada.
+- **Los agentes sí abren Pull Request; lo que no hacen nunca es el merge.** Al terminar una tarea, el agente sube su rama y abre la PR hacia `main` (título y descripción en español). El merge lo hace siempre una persona.
 - Una rama por tarea o proyecto (`<tipo>/kan-<n>-<descripcion>`), no por persona.
 - Nunca subir secretos (`.env`, keystores, tokens) ni archivos generados (`dist/`, `*.apk`).
 - Nombres de código y carpetas en inglés; documentación y commits en español.
