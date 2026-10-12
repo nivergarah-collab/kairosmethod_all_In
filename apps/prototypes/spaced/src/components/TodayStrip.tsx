@@ -9,7 +9,7 @@ export function TodayStrip() {
   const objective = state.settings.periodEnd === todayKey();
 
   return (
-    <p className="today-strip">
+    <p className="today-strip" data-tour="today">
       Hoy: {plural(hoy, 'tarjeta')} · Mañana: {manana > 0 ? plural(manana, 'tarjeta') : 'ninguna'}
       {objective ? ' · ¡Hoy es tu fecha objetivo!' : ''}
     </p>

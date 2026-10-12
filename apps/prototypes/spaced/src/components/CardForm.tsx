@@ -46,7 +46,7 @@ export function CardForm({ editingId, questionRef, onStopEdit }: Props) {
   }
 
   return (
-    <aside className="nueva-ficha" aria-label="Agregar ficha">
+    <aside className="nueva-ficha" aria-label="Agregar ficha" data-tour="card-form">
       <div className="ficha-head">
         <span className="ficha-title">{editing ? 'Editar ficha' : 'Ficha nueva'}</span>
         <span className="ficha-hint">

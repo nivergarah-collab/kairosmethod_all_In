@@ -15,7 +15,7 @@ export function Notepad() {
   const diff = settings.periodEnd ? daysBetween(todayKey(), settings.periodEnd) : null;
 
   return (
-    <aside className="notepad" aria-label="Meta del día">
+    <aside className="notepad" aria-label="Meta del día" data-tour="notepad">
       <h2 className="notepad-title">Meta del día</h2>
 
       <div className="goal-row">

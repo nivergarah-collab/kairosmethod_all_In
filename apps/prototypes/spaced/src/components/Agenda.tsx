@@ -51,7 +51,7 @@ export function Agenda() {
   const calendar = view === 'calendar' ? generateCalendarDays() : null;
 
   return (
-    <aside className="fichero" aria-label="Agenda de repasos">
+    <aside className="fichero" aria-label="Agenda de repasos" data-tour="agenda">
       <div className="fichero-front">
         <span className="fichero-plate">Agenda de repasos</span>
         <div className="fichero-controls">

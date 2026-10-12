@@ -30,7 +30,7 @@ export function ReviewBook({ card, queueLength, revealed, pressing, onReveal, on
   const badge = `${PHASE_LABEL[phase]}${card.interval > 0 ? ` · cada ${card.interval} d` : ' · nueva'}${vencida ? ' · vencida' : ''}`;
 
   return (
-    <section className="book">
+    <section className="book" data-tour="book">
       <div className="page page-left">
         <div className="page-head">
           <span>Pendientes hoy: {plural(queueLength, 'tarjeta')}</span>
@@ -65,7 +65,7 @@ export function ReviewBook({ card, queueLength, revealed, pressing, onReveal, on
             Abrir respuesta
           </button>
 
-          <div hidden={!revealed}>
+          <div hidden={!revealed} data-tour="stamps">
             <span className="stamps-label">Sella tu calificación</span>
             <div className="stamps-row">
               {STAMPS.map((s) => (
