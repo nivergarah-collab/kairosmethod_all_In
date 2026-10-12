@@ -47,6 +47,7 @@ export default function Desk({ state, phase, dispatch, duePauses = [], elapsed =
       ref={deskRef}
       className={`desk tpl-${template} bg-${background}${lamps.length ? ' lit' : ''}${dropReady ? ' drop-ready' : ''}`}
       data-testid="desk"
+      data-tour="desk"
       data-background={background}
       aria-label="Escritorio"
       onDragOver={(e) => { e.preventDefault(); if (!dropReady) setDropReady(true); }}

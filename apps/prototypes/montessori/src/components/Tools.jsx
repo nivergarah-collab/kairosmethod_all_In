@@ -120,7 +120,7 @@ export default function Tools({ state, dispatch, elapsed, open, setOpen, tab, se
     e.currentTarget.querySelector(`#tab-${ids[next]}`)?.focus();
   };
   return (
-    <aside className={`tools${open ? ' open' : ''}`} aria-label="Menú de herramientas">
+    <aside className={`tools${open ? ' open' : ''}`} data-tour="tools" aria-label="Menú de herramientas">
       <div className="tools-slots">
         <button
           type="button"

@@ -7,7 +7,7 @@ const slot = (n) => ({ x: 16 + (n % 4) * 23, y: 24 + (Math.floor(n / 4) % 3) * 2
 export default function Tray({ dispatch, count }) {
   const add = (type) => dispatch({ type: 'add', itemType: type, ...slot(count) });
   return (
-    <nav className="tray" aria-label="Bandeja de elementos">
+    <nav className="tray" data-tour="tray" aria-label="Bandeja de elementos">
       <ul>
         {Object.entries(ITEM_TYPES).map(([type, def]) => (
           <li
