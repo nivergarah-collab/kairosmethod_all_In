@@ -9,6 +9,7 @@ export function UserSelectorBar({ user, onSwitchUserClick }) {
   return (
     <Surface
       testId="user_selector_bar"
+      tour="profile"
       onClick={onSwitchUserClick}
       radius={16}
       color={alpha('var(--surface-variant)', 0.7)}

@@ -23,12 +23,13 @@ export function Icon({ name, size = 24, tint, style, className, label }) {
 }
 
 /** Surface (color por defecto: surface). radius en dp; border: string CSS; onClick lo vuelve clicable. */
-export function Surface({ color, radius = 0, border, onClick, className, style, children, testId, as: As = 'div' }) {
+export function Surface({ color, radius = 0, border, onClick, className, style, children, testId, tour, as: As = 'div' }) {
   return (
     <As
       className={cx('m3-surface', onClick && 'm3-state', className)}
       onClick={onClick}
       data-testid={testId}
+      data-tour={tour}
       style={{ background: color, borderRadius: radius, border, overflow: radius ? 'hidden' : undefined, ...style }}
     >
       {children}
@@ -37,12 +38,13 @@ export function Surface({ color, radius = 0, border, onClick, className, style, 
 }
 
 /** Card: containerColor obligatorio en el APK (siempre lo pasa). Elevación 0dp por defecto. */
-export function Card({ color, radius = 12, border, className, style, children, testId, onClick }) {
+export function Card({ color, radius = 12, border, className, style, children, testId, tour, onClick }) {
   return (
     <div
       className={cx('m3-card', onClick && 'm3-state', className)}
       onClick={onClick}
       data-testid={testId}
+      data-tour={tour}
       style={{ background: color, borderRadius: radius, border, ...style }}
     >
       {children}
@@ -51,7 +53,7 @@ export function Card({ color, radius = 12, border, className, style, children, t
 }
 
 function buttonImpl(kind) {
-  return function Btn({ onClick, color, contentColor, radius, height, icon, iconSize = 18, children, className, style, testId, disabled }) {
+  return function Btn({ onClick, color, contentColor, radius, height, icon, iconSize = 18, children, className, style, testId, tour, disabled }) {
     return (
       <button
         type="button"
@@ -59,6 +61,7 @@ function buttonImpl(kind) {
         onClick={onClick}
         disabled={disabled}
         data-testid={testId}
+        data-tour={tour}
         style={{ background: color, color: contentColor, borderRadius: radius, height, ...style }}
       >
         {icon && <Icon name={icon} size={iconSize} className="m3-btn-icon" />}

@@ -58,7 +58,7 @@ export function ActiveTimerScreen() {
       <div className="rs-grid">
       <div className="rs-col">
       {/* Header with Session Topic */}
-      <Card color={alpha('var(--surface-variant)', 0.5)} radius={16} style={{ width: '100%', margin: '4px 0', boxSizing: 'border-box' }}>
+      <Card tour="session-header" color={alpha('var(--surface-variant)', 0.5)} radius={16} style={{ width: '100%', margin: '4px 0', boxSizing: 'border-box' }}>
         <div style={{ boxSizing: 'border-box', width: '100%', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <T v="titleLarge" w="extrabold" color="var(--on-surface)" as="div" style={{ textAlign: 'center' }}>
             {topic.trim() === '' ? 'Tema General' : topic}
@@ -109,14 +109,14 @@ export function ActiveTimerScreen() {
       <div style={{ height: 8 }} />
 
       {/* Timer display arc */}
-      <div style={{ padding: '8px 0' }}>
+      <div data-tour="timer-arc" style={{ padding: '8px 0' }}>
         <PomodoroTimerArc phase={currentPhase} secondsRemaining={secondsRemaining} totalSeconds={phaseTotalSeconds} isRunning={isTimerRunning} />
       </div>
 
       <div style={{ height: 12 }} />
 
       {/* Primary Timer Controls Row */}
-      <div style={{ boxSizing: 'border-box', width: '100%', padding: '0 8px', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+      <div data-tour="timer-controls" style={{ boxSizing: 'border-box', width: '100%', padding: '0 8px', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
         {/* +5 min button */}
         <FilledTonalButton onClick={() => vm.addMinutes(5)} radius="50%" height={52} style={{ width: 52, padding: 0 }}>
           <T v="labelLarge" w="bold" size={13}>+5m</T>
@@ -148,6 +148,7 @@ export function ActiveTimerScreen() {
       {currentBlock != null && (
         <Card
           testId="current_block_banner"
+          tour="block-banner"
           color={currentBlock.isCompleted ? alpha('var(--break-green)', 0.15) : alpha('var(--pomo-primary)', 0.12)}
           border={`1.5px solid ${currentBlock.isCompleted ? 'var(--break-green)' : 'var(--pomo-primary)'}`}
           radius={18}
@@ -187,7 +188,7 @@ export function ActiveTimerScreen() {
       <div style={{ height: 20 }} />
 
       {/* Action row: End session or cancel */}
-      <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+      <div data-tour="block-banner" style={{ display: 'flex', gap: 10, width: '100%' }}>
         <OutlinedButton onClick={() => setShowCancelDialog(true)} radius={14} style={{ flex: '1 1 0', minWidth: 0 }}>
           <Icon name="Close" size={16} />
           <div style={{ width: 6, flex: 'none' }} />
@@ -204,7 +205,7 @@ export function ActiveTimerScreen() {
       <div style={{ height: 24 }} />
 
       {/* Blocks Timeline header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+      <div data-tour="blocks" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         <T v="titleMedium" w="bold" color="var(--on-surface)">Progreso de Bloques</T>
         <T v="labelLarge" w="bold" color="var(--break-green)">{`${activeBlocks.filter((b) => b.isCompleted).length}/${activeBlocks.length} hechos`}</T>
       </div>
@@ -213,7 +214,7 @@ export function ActiveTimerScreen() {
 
       {/* List of all session blocks */}
       {activeBlocks.map((block) => (
-        <div key={block.index} style={{ width: '100%', padding: '4px 0' }}>
+        <div key={block.index} data-tour="blocks" style={{ width: '100%', padding: '4px 0' }}>
           <BlockTimelineCard
             index={block.index}
             title={block.title}

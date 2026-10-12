@@ -53,6 +53,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         <Surface
           testId="config_daily_goal_card"
+          tour="profile"
           radius={14}
           color={alpha('var(--surface-variant)', 0.5)}
           onClick={() => setShowGoalEditor(true)}
@@ -96,7 +97,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         {spacer(8)}
 
-        <div className="sc-hscroll" style={{ gap: 10 }}>
+        <div className="sc-hscroll" data-tour="presets" style={{ gap: 10 }}>
           {vm.presets.map((preset) => {
             const isSelected =
               blocksCount === preset.blocks && workMinutes === preset.workMinutes && shortBreakMinutes === preset.shortBreakMinutes;
@@ -122,6 +123,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         {spacer(18)}
 
+        <div data-tour="topic">
         <T v="titleSmall" w="bold" style={{ display: 'block' }}>Materia y Tema de Estudio</T>
 
         {spacer(8)}
@@ -160,12 +162,13 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
           placeholder="Ej. Resolver guía de ejercicios, Memorizar vocabulario..."
           radius={14}
         />
+        </div>
 
         {spacer(20)}
         </div>
 
         <div className="rs-col">
-        <Card color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
+        <Card tour="sliders" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
           <div style={{ padding: 16 }}>
             <SliderRow
               label="Número de bloques de estudio"
@@ -197,7 +200,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         {spacer(16)}
 
-        <Card testId="theme_switch_card" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
+        <Card testId="theme_switch_card" tour="prefs" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: 16, boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
               <div
@@ -236,7 +239,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         {spacer(14)}
 
-        <Card testId="alerts_settings_card" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
+        <Card testId="alerts_settings_card" tour="prefs" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
           <div style={{ padding: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <div
@@ -333,6 +336,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
         {spacer(14)}
 
         <Surface
+          tour="blockgoals"
           radius={14}
           color={alpha('var(--surface-variant)', 0.5)}
           onClick={() => setShowBlockGoalsCustomizer(!showBlockGoalsCustomizer)}
@@ -369,6 +373,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         <Button
           testId="start_session_button"
+          tour="start"
           onClick={() => vm.startSession()}
           color="var(--pomo-primary)"
           radius={16}

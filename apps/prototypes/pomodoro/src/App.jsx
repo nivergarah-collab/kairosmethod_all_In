@@ -11,10 +11,14 @@ import { ActiveTimerScreen } from './screens/ActiveTimerScreen.jsx';
 import { StatsScreen } from './screens/StatsScreen.jsx';
 import { SessionSummaryDialog } from './screens/SessionSummaryDialog.jsx';
 import { UserManagementDialog } from './screens/UserManagementDialog.jsx';
+import Tutorial from './tutorial/Tutorial.jsx';
+import { getStorage, shouldAutoOpen } from './tutorial/persist.js';
 
 function PomoStudyApp() {
   const { state, vm } = useVM();
   const [showUserDialog, setShowUserDialog] = useState(false);
+  // El tutorial se abre solo la primera vez y se repite con el botón «?» (Ayuda)
+  const [showTutorial, setShowTutorial] = useState(() => shouldAutoOpen(getStorage()));
   const isDark = useEffectiveDark();
 
   useEffect(() => {
@@ -54,6 +58,10 @@ function PomoStudyApp() {
               </button>
             );
           })}
+          <button type="button" className="nav-item nav-help" onClick={() => setShowTutorial(true)} aria-label="Ver tutorial" title="Ver tutorial" data-tour="help" data-testid="help_button">
+            <span className="nav-ind"><span className="help-mark" aria-hidden="true">?</span></span>
+            <span className="nav-label" aria-hidden="true">Ayuda</span>
+          </button>
         </nav>
       </div>
 
@@ -66,6 +74,7 @@ function PomoStudyApp() {
           onDismiss={() => setShowUserDialog(false)}
         />
       )}
+      {showTutorial && <Tutorial onClose={() => setShowTutorial(false)} />}
       {state.showSummaryDialog && state.lastSummary && (
         <SessionSummaryDialog
           summary={state.lastSummary}

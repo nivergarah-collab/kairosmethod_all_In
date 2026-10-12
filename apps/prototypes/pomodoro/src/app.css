@@ -21,6 +21,11 @@
 
 .nav-brand { display: none; }
 
+/* Botón «?» (Ayuda): un cuarto elemento angosto al final de la barra; abre el tutorial */
+.nav-help { flex: none; width: 56px; padding-left: 0; padding-right: 8px; }
+.nav-help .nav-ind { width: 32px; }
+.nav-help .help-mark { width: 24px; height: 24px; box-sizing: border-box; border: 2px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; font-weight: 700; }
+
 /* Grupos de disposición de cada pantalla: en celular no generan caja, por lo que el flujo es el de siempre */
 .rs-grid, .rs-col { display: contents; }
 
@@ -46,6 +51,7 @@
     border-right: 1px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);
   }
   .nav-item { flex: none; height: 76px; padding-top: 8px; justify-content: center; border-radius: 16px; }
+  .nav-help { width: auto; margin-top: auto; padding-right: 0; }
 }
 
 /* ---------- PC amplio: ≥ 1100px ---------- */
@@ -55,7 +61,7 @@
   .nav-brand { display: block; padding: 6px 16px 18px; font-size: 22px; line-height: 28px; font-weight: 700; color: var(--pomo-primary); letter-spacing: 0; }
   .nav-item { flex-direction: row; justify-content: flex-start; align-items: center; gap: 14px; height: 56px; padding: 0 18px; border-radius: 28px; text-align: left; }
   .nav-item.sel { background: color-mix(in srgb, var(--pomo-primary) 15%, transparent); }
-  .nav-item .nav-ind { width: 24px; height: 24px; border-radius: 0; background: transparent; }
+  .nav-item .nav-ind, .nav-help .nav-ind { width: 24px; height: 24px; border-radius: 0; background: transparent; }
   .nav-item.sel .nav-ind { background: transparent; }
   .nav-item .nav-label { margin-top: 0; font-size: 14px; line-height: 20px; letter-spacing: 0.1px; }
   .nav-badge { top: -2px; right: -3px; }

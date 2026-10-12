@@ -41,12 +41,14 @@ export function StatsScreen({ onOpenUserDialog }) {
       <div style={{ height: 14 }} />
 
       {/* Daily Goal Dynamic Progress Card */}
-      <DailyGoalProgressCard user={activeUser} sessions={sessions} onEditGoalClick={() => setShowGoalEditor(true)} />
+      <div data-tour="stats-goal">
+        <DailyGoalProgressCard user={activeUser} sessions={sessions} onEditGoalClick={() => setShowGoalEditor(true)} />
+      </div>
 
       <div style={{ height: 16 }} />
 
       {/* KPI Grid */}
-      <div style={{ display: 'flex', width: '100%', gap: 10 }}>
+      <div data-tour="stats-kpis" style={{ display: 'flex', width: '100%', gap: 10 }}>
         <StatCard
           title="Tiempo Total"
           value={totalFocusHours > 0 ? `${totalFocusHours}h ${remainingMinutes}m` : `${totalFocusMinutes}m`}
@@ -65,7 +67,7 @@ export function StatsScreen({ onOpenUserDialog }) {
 
       <div style={{ height: 10 }} />
 
-      <div style={{ display: 'flex', width: '100%', gap: 10 }}>
+      <div data-tour="stats-kpis" style={{ display: 'flex', width: '100%', gap: 10 }}>
         <StatCard
           title="Bloques Hechos"
           value={`${totalBlocksCompleted}`}
@@ -85,14 +87,16 @@ export function StatsScreen({ onOpenUserDialog }) {
       <div style={{ height: 20 }} />
 
       {/* Weekly Study Productivity Chart (Weekly hours summary, daily breakdown & target goal) */}
-      <WeeklyStudyProductivityCard sessions={sessions} dailyGoalMinutes={activeUser?.dailyGoalMinutes ?? 100} />
+      <div data-tour="stats-week">
+        <WeeklyStudyProductivityCard sessions={sessions} dailyGoalMinutes={activeUser?.dailyGoalMinutes ?? 100} />
+      </div>
 
       <div style={{ height: 14 }} />
       </div>
 
       <div className="rs-col">
       {/* Individual Sessions Bar Chart (Collapsible/Secondary visualization) */}
-      <Card color="var(--surface)" radius={16} border={`1px solid ${alpha('var(--outline-variant)', 0.4)}`} style={{ width: '100%' }}>
+      <Card tour="history" color="var(--surface)" radius={16} border={`1px solid ${alpha('var(--outline-variant)', 0.4)}`} style={{ width: '100%' }}>
         <div style={{ padding: 16 }}>
           <T v="titleSmall" w="bold" as="div">Actividad por Sesión Individual (min)</T>
           <div style={{ height: 12 }} />
@@ -103,7 +107,7 @@ export function StatsScreen({ onOpenUserDialog }) {
       <div style={{ height: 20 }} />
 
       {/* History Section Header */}
-      <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div data-tour="history" style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
         <T v="titleMedium" w="bold">{`Historial de Sesiones (${sessions.length})`}</T>
       </div>
 
@@ -111,6 +115,7 @@ export function StatsScreen({ onOpenUserDialog }) {
 
       {sessions.length === 0 ? (
         <Card
+          tour="history"
           color={alpha('var(--surface-variant)', 0.35)}
           radius={16}
           style={{ width: '100%', margin: '16px 0', boxSizing: 'border-box' }}
@@ -194,6 +199,7 @@ function SessionHistoryCard({ session, onDeleteClick, style }) {
   return (
     <Card
       testId={`session_history_item_${session.id}`}
+      tour="history"
       color="var(--surface)"
       radius={16}
       border={`1px solid ${alpha('var(--outline-variant)', 0.4)}`}
