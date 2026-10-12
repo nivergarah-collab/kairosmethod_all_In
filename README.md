@@ -10,7 +10,7 @@ El repositorio será **público y colaborativo**, sin organización de GitHub ni
 
 | Carpeta | Contenido | Estado |
 |---|---|---|
-| `apps/prototypes/<método>` | Prototipos aislados (pomodoro, montessori, kaizen): un proyecto React responsive cada uno, solo web | Montessori listo; Pomodoro y Kaizen vacíos |
+| `apps/prototypes/<método>` | Prototipos aislados (pomodoro, montessori, kaizen, spaced): un proyecto React responsive cada uno, solo web | Montessori, Pomodoro, Kaizen y Repetición Espaciada listos |
 | `apps/student` | App del estudiante; el apk con Capacitor es una posibilidad futura | Vacío |
 | `apps/teacher/{web,mobile}` | App del docente (estructura por confirmar; apk futura) | Vacío |
 | `web/portal` | Índice de métodos: enlaza a los prototipos habilitados y marca el resto como «Próximamente»; luego, el dashboard real | Base |

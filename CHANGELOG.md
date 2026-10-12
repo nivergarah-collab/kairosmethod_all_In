@@ -13,9 +13,13 @@ El changelog del espacio de trabajo (Notion, Jira, Confluence) es otro: 📜 CHA
 - KAN-24: `AGENTS.md` como punto de entrada único para cualquier agente de IA (`CLAUDE.md` lo importa); remite a las skills locales si existen.
 - KAN-14: portal mínimo en `web/portal` (React + Vite): lista los métodos de estudio; Montessori enlaza a su prototipo y Pomodoro, Kaizen y «Por definir» aparecen como «Próximamente». Lista en `src/methods.js` con pruebas.
 - KAN-14: prototipo Montessori (v0.5.13) en `apps/prototypes/montessori`: ambiente de estudio responsive con escritorio, bandeja, sesión con cronómetro, herramientas y guardado local. Incluye 54 pruebas de lógica.
+- KAN-15: prototipo Pomodoro (v0.1.0) en `apps/prototypes/pomodoro`: réplica web de la app PomoStudy, con 9 pruebas de lógica.
+- KAN-16: prototipo Kaizen (v0.1.0) en `apps/prototypes/kaizen`: jardín de hábitos con escena y plantas movibles, guardado local y 70 pruebas.
+- Prototipo Repetición Espaciada (v3.0.0) en `apps/prototypes/spaced` (React 19 + TypeScript, algoritmo SM-2, agenda y 49 pruebas). Autoría: ST-opc.
 - Este `CHANGELOG.md`.
 
 ### Cambiado
+- El portal habilita Pomodoro, Kaizen y Repetición Espaciada junto a Montessori; «Por definir» sigue como «Próximamente». Actualizados `web/portal/README.md`, `README.md`, `apps/prototypes/README.md`, `docs/despliegue.md`, `docs/decisiones.md` y `docs/estructura.md`.
 - Modelo responsive (07-oct): cada app es un solo proyecto React que se adapta a PC y celular; el apk de `student` sale del mismo código con Capacitor (web empaquetada). Se quitaron las subcarpetas `web/` y `mobile/` de los prototipos y de `apps/student/`; `apps/teacher/` conserva `web/` y `mobile/` por confirmar.
 - `docs/mobile.md` describe el modelo responsive + Capacitor como destino aún no implementado. Actualizados `docs/estructura.md`, `docs/despliegue.md`, `docs/decisiones.md`, `README.md`, `CONTRIBUTING.md` y los README de `apps/`.
 - Pages queda preparado, pero no despliega hasta que el portal y los prototipos base estén construidos y enlazados. CI, build Android y publicación Docker no se activan hasta que exista una tarea real que ejecutar.

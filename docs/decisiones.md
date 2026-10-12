@@ -32,4 +32,5 @@
 | 2026-10-07 | `apps/teacher/` mantiene `web/` y `mobile/` separadas (la app de celular y la web son cosas diferentes); estructura final por confirmar y fuera de esta fase | Por confirmar |
 | 2026-10-07 | `docs/mobile.md` pasa a describir el modelo responsive + Capacitor (reemplaza la regla de dos capas) | Decidido |
 | 2026-10-08 | La fuente de las skills es `skills/` en el repo privado `allinchile-anexos`; Notion mantiene un espejo. No se distribuyen por ZIP/pendrive ni se copian al repo público `kairosmethod` | Vigente |
-| 2026-10-08 | El portal lista los métodos y marca como «Próximamente» los que aún no tienen prototipo (hoy Pomodoro, Kaizen y «Por definir»); el primer método habilitado es Montessori, y entra con la versión 0.5.13 de su prototipo | Decidido |
+| 2026-10-08 | El portal lista los métodos y marca como «Próximamente» los que aún no tienen prototipo; el primer método habilitado es Montessori, y entra con la versión 0.5.13 de su prototipo | Decidido |
+| 2026-10-11 | Se habilitan en el portal Pomodoro (v0.1.0, en `apps/prototypes/pomodoro/`), Kaizen (v0.1.0) y Repetición Espaciada (v3.0.0, carpeta nueva `apps/prototypes/spaced/`), traspasados desde las referencias sin cambios de funcionamiento. Hoy solo «Por definir» queda como «Próximamente»; Montessori no cambia | Decidido |
