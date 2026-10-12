@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog.jsx';
+import HelpButton from '../tutorial/HelpButton.jsx';
 import { BACKGROUNDS, TEMPLATES, formatClock } from '../state.js';
 import { EXAMPLES, exampleWorkspace, exampleGlyphs } from '../examples.js';
 
 function Segmented({ label, options, value, onChange }) {
   return (
-    <div className="seg" role="group" aria-label={label}>
+    <div className="seg" data-tour="look" role="group" aria-label={label}>
       <span className="seg-label">{label}</span>
       <div className="seg-opts">
         {options.map((o) => (
@@ -24,7 +25,7 @@ function Segmented({ label, options, value, onChange }) {
   );
 }
 
-export default function Topbar({ state, progress, stopwatch, dispatch, onStart, onFinish, onDownload, onImport, onErase, saveOk, focusMode, onFocusMode }) {
+export default function Topbar({ state, progress, stopwatch, dispatch, onStart, onFinish, onDownload, onImport, onErase, saveOk, focusMode, onFocusMode, onHelp }) {
   const [dataOpen, setDataOpen] = useState(false);
   const [confirmErase, setConfirmErase] = useState(false);
   const [importMsg, setImportMsg] = useState(null);
@@ -77,7 +78,7 @@ export default function Topbar({ state, progress, stopwatch, dispatch, onStart, 
   return (
     <header className={`topbar${session ? ' in-session' : ''}`}>
       {!session && (
-      <div className="brand">
+      <div className="brand" data-tour="progress">
         <h1>Prepara tu espacio</h1>
         <p data-testid="progress-text" aria-live="polite">
           {progress.total === 0
@@ -92,7 +93,7 @@ export default function Topbar({ state, progress, stopwatch, dispatch, onStart, 
       </div>
       )}
 
-      <div className={`clock${clockHidden ? ' hidden' : ''}`}>
+      <div className={`clock${clockHidden ? ' hidden' : ''}`} data-tour="clock">
         {clockHidden ? (
           <button type="button" className="btn ghost" onClick={() => setClockHidden(false)}>
             Mostrar cronómetro
@@ -120,17 +121,18 @@ export default function Topbar({ state, progress, stopwatch, dispatch, onStart, 
       </div>
 
       {session ? (
-        <div className="controls session-controls">
+        <div className="controls session-controls" data-tour="session">
           <button type="button" className={`btn ghost subtle${focusMode ? ' on' : ''}`} aria-pressed={focusMode} aria-keyshortcuts="F" title="Atenúa los elementos secundarios (atajo: F)" onClick={onFocusMode}>
             Modo enfoque
           </button>
           <button type="button" className="btn ghost subtle" onClick={onFinish}>
             Terminar sesión
           </button>
+          <HelpButton onClick={onHelp} />
         </div>
       ) : (
       <div className="controls">
- <div className="mobile-selects">
+ <div className="mobile-selects" data-tour="look">
           <label>
             <span className="sr-only">Fondo</span>
             <select value={state.background} onChange={(e) => dispatch({ type: 'setBackground', background: e.target.value })}>
@@ -155,7 +157,7 @@ export default function Topbar({ state, progress, stopwatch, dispatch, onStart, 
         <Segmented label="Fondo" options={BACKGROUNDS} value={state.background} onChange={(background) => dispatch({ type: 'setBackground', background })} />
         <Segmented label="Aspecto" options={TEMPLATES} value={state.template} onChange={(template) => dispatch({ type: 'setTemplate', template })} />
         <div className="actions">
-          <div className="menu examples" ref={exRef}>
+          <div className="menu examples" ref={exRef} data-tour="examples">
             <button type="button" className="btn ghost" aria-expanded={exOpen} aria-haspopup="true" aria-controls="examples-pop" ref={exBtn} onClick={() => { setExOpen(!exOpen); setDataOpen(false); }}>
               Ejemplos ▾
             </button>
@@ -175,7 +177,7 @@ export default function Topbar({ state, progress, stopwatch, dispatch, onStart, 
           <button type="button" className="btn ghost wide-only" disabled={empty} onClick={() => ask('clear')}>
             Vaciar
           </button>
-          <div className="menu">
+          <div className="menu" data-tour="data">
             <button type="button" className="btn ghost" aria-expanded={dataOpen} aria-haspopup="true" onClick={() => { setDataOpen(!dataOpen); setConfirmErase(false); setExOpen(false); }}>
               Datos ▾
             </button>
@@ -238,9 +240,10 @@ export default function Topbar({ state, progress, stopwatch, dispatch, onStart, 
               </div>
             )}
           </div>
-          <button type="button" className="btn primary start" aria-label="Iniciar sesión de estudio" onClick={onStart}>
+          <button type="button" className="btn primary start" data-tour="start" aria-label="Iniciar sesión de estudio" onClick={onStart}>
             Iniciar sesión<span className="long-only"> de estudio</span>
           </button>
+          <HelpButton onClick={onHelp} />
         </div>
       </div>
       )}

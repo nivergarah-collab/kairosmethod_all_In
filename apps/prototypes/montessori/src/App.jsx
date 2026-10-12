@@ -8,6 +8,8 @@ import Tray from './components/Tray.jsx';
 import Tools from './components/Tools.jsx';
 import SummaryDialog from './components/SummaryDialog.jsx';
 import useStopwatch from './components/useStopwatch.js';
+import Tutorial from './tutorial/Tutorial.jsx';
+import { getStorage, shouldAutoOpen } from './tutorial/persist.js';
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
@@ -23,6 +25,8 @@ export default function App() {
   const [toolsTab, setToolsTab] = useState('tasks');
   const [summary, setSummary] = useState(null);
   const [focusMode, setFocusMode] = useState(false);
+  // Tutorial: se abre solo la primera vez (si el almacenamiento falla, una vez por carga de la página).
+  const [tourOpen, setTourOpen] = useState(() => shouldAutoOpen(getStorage()));
   const progress = getProgress(state.items);
   const session = state.phase === 'session';
   const sessionRef = useRef(session);
@@ -97,12 +101,13 @@ export default function App() {
 
   return (
     <div className={`app${toolsOpen ? ' tools-open' : ''}${session ? ' in-session' : ''}${session && focusMode ? ' focus' : ''}`}>
-      <Topbar state={state} progress={progress} stopwatch={stopwatch} dispatch={dispatch} onStart={start} onFinish={finish} onDownload={downloadWorkspace} onImport={importWorkspace} onErase={eraseSaved} saveOk={saveOk} focusMode={focusMode} onFocusMode={() => setFocusMode((f) => !f)} />
+      <Topbar state={state} progress={progress} stopwatch={stopwatch} dispatch={dispatch} onStart={start} onFinish={finish} onDownload={downloadWorkspace} onImport={importWorkspace} onErase={eraseSaved} saveOk={saveOk} focusMode={focusMode} onFocusMode={() => setFocusMode((f) => !f)} onHelp={() => setTourOpen(true)} />
       <main className="stage">
         <Desk state={state} phase={state.phase} dispatch={dispatch} duePauses={due} elapsed={stopwatch.elapsed} />
       </main>
       <Tools state={state} dispatch={dispatch} elapsed={stopwatch.elapsed} open={toolsOpen} setOpen={setToolsOpen} tab={toolsTab} setTab={setToolsTab} />
       <Tray dispatch={dispatch} count={state.items.length} />
+      {tourOpen && <Tutorial onClose={() => setTourOpen(false)} tools={{ open: toolsOpen, set: setToolsOpen }} />}
       {summary && <SummaryDialog summary={summary} onClose={closeSummary} />}
     </div>
   );

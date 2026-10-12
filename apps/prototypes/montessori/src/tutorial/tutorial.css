@@ -1,0 +1,33 @@
+/* Tutorial guiado: reutiliza las variables, botones y tarjetas de styles.css */
+.help-btn { width: 34px; height: 34px; padding: 0; border-radius: 50%; font-weight: 700; font-size: 1rem; flex: 0 0 auto; display: inline-grid; place-items: center; }
+
+.tour { position: fixed; inset: 0; z-index: 200; }
+.tour-dim { position: absolute; inset: 0; background: rgba(15, 12, 8, .62); }
+.tour-spot {
+  position: fixed; border-radius: 12px; pointer-events: none;
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--accent), 0 0 0 100vmax rgba(15, 12, 8, .62);
+  transition: top .2s ease, left .2s ease, width .2s ease, height .2s ease;
+}
+.tour-card {
+  position: fixed; width: 340px; max-height: calc(100dvh - 24px); overflow-y: auto; display: grid; gap: 10px; padding: 14px 16px 16px;
+  background: var(--paper); color: var(--ink); border-radius: 16px; box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+  animation: tour-in .18s ease-out;
+}
+.tour-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tour-count { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.tour-card .meter { height: 4px; }
+.tour-body { display: grid; gap: 6px; }
+.tour-card h2 { display: flex; align-items: center; gap: .5em; font-size: 1.05rem; }
+.tour-card footer { display: flex; justify-content: flex-end; gap: 8px; }
+@keyframes tour-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Durante el paso de un elemento se deja a la vista su barrita de controles */
+.item[data-tour-peek] > .bar { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot, .tour-card { animation: none !important; transition: none !important; }
+}
+@media (forced-colors: active) {
+  .tour-card { border: 1px solid CanvasText; }
+  .tour-spot { outline: 3px solid Highlight; }
+}

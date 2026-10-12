@@ -73,6 +73,7 @@ function ItemCard({
     <article
       className={`item item-${item.type} view-${item.view} size-${item.size}${prep && item.done ? ' done' : ''}${selected ? ' selected' : ''}${item.y < 28 ? ' bar-below' : ''}`}
       data-testid="item"
+      data-tour="item"
       data-type={item.type}
       data-view={item.view}
       data-size={item.size}

@@ -2,7 +2,7 @@
 
 Borrador de la sección **montessori** (KAN-14): un **ambiente de estudio** que se arma como un escritorio real y se usa durante toda la sesión. Proyecto React (Vite) responsive, solo web.
 
-Versión `0.5.13` (la fuente es el campo `version` de `package.json`; el primer número oficial lo define el equipo).
+Versión `0.6.0` (la fuente es el campo `version` de `package.json`; el primer número oficial lo define el equipo).
 
 ## Qué hace
 
@@ -25,6 +25,14 @@ Versión `0.5.13` (la fuente es el campo `version` de `package.json`; el primer 
 - Adaptado a celular (360 px), tablet y pantallas bajas en horizontal.
 
 - **Guardado básico en localStorage** (con try/catch): espacio (elementos, posiciones, tamaños, vistas, fondo, aspecto, estado de lámpara y vaso), lista de tareas, metas y distracciones. Todo lo leído se valida y sanea, con número de versión del esquema (`schema: 1`); si está corrupto o es de otra versión se ignora y se parte limpio. Menú **Datos**: descargar el espacio en JSON y «Borrar datos guardados». Nada sale del navegador. Importar el espacio desde un JSON descargado (extra, con validación estricta).
+
+## Tutorial
+
+Recorrido guiado que se abre solo la primera vez que se entra (también con el botón **«?»** de la barra superior, «Ver tutorial»). Oscurece la pantalla, resalta cada parte real de la interfaz (bandeja, escritorio, controles de un elemento, cronómetro, fondo y aspecto, ejemplos, datos, herramientas y sesión) y explica en una tarjeta con «Anterior», «Siguiente», «Terminar», «Saltar tutorial» (o Escape) y el avance «Paso n de m». Los pasos cuyo elemento no está a la vista (por ejemplo los de preparación durante una sesión) se omiten. No guarda datos de ejemplo ni cambia tu escritorio.
+
+- Recuerda en `localStorage` (clave `kairos_montessori_tutorial_v1`, valores `done` o `skipped`) que ya se vio; si el almacenamiento está bloqueado la app sigue funcionando y el tutorial se abre una vez por carga.
+- Los elementos que se resaltan llevan `data-tour="..."`.
+- Lógica pura y probada en `src/tutorial/` (`steps.js`, `flow.js`, `persist.js`, `position.js`, pruebas en `tutorial.test.js`); la parte visual en `Tutorial.jsx`, `HelpButton.jsx` y `tutorial.css`.
 
 Fuera de alcance: cuentas, servidor, sonido, APIs de música, visor de archivos, ventanas flotantes.
 
@@ -49,6 +57,7 @@ src/download.js            descarga de JSON (Blob + enlace)
 src/storage.js             guardado, validación y saneamiento (localStorage)
 src/storage.test.js        pruebas del guardado
 src/styles.css             estilos
+src/tutorial/              tutorial guiado y botón «?» (ver sección Tutorial)
 ```
 
 ## Comandos
