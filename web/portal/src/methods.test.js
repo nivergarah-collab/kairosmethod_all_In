@@ -25,8 +25,8 @@ test('cada método tiene nombre, resumen y un estado conocido', () => {
   }
 });
 
-test('hoy solo Montessori está habilitado', () => {
-  assert.deepEqual(methods.filter(isAvailable).map((m) => m.id), ['montessori']);
+test('hoy están habilitados Montessori, Pomodoro, Kaizen y Repetición Espaciada', () => {
+  assert.deepEqual(methods.filter(isAvailable).map((m) => m.id), ['montessori', 'pomodoro', 'kaizen', 'spaced']);
 });
 
 test('cada método habilitado tiene su prototipo en apps/prototypes', () => {

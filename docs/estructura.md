@@ -3,7 +3,7 @@
 ```
 .github/            workflow de Pages preparado, plantillas de PR e issues
 apps/
-  prototypes/<método>/   un proyecto React responsive por método (pomodoro, montessori, kaizen); solo web
+  prototypes/<método>/   un proyecto React responsive por método (pomodoro, montessori, kaizen, spaced); solo web
   student/               app futura; Capacitor/apk aún no implementados
   teacher/{web,mobile}   estructura por confirmar; no se trabaja en esta fase
 web/portal/         índice hoy; dashboard real mañana

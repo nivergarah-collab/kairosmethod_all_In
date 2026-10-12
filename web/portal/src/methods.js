@@ -3,8 +3,9 @@
 // Al habilitar uno: crear su prototipo, agregarlo a PAGES_REQUIRED_PROTOTYPES y al <noscript> de index.html.
 export const methods = [
   { id: 'montessori', name: 'Montessori', summary: 'Arma tu escritorio de estudio y trabaja a tu propio ritmo.', status: 'available' },
-  { id: 'pomodoro', name: 'Pomodoro', summary: 'Bloques de enfoque con descansos cortos para mantener la atención.', status: 'soon' },
-  { id: 'kaizen', name: 'Kaizen', summary: 'Mejora continua con pasos pequeños y constantes.', status: 'soon' },
+  { id: 'pomodoro', name: 'Pomodoro', summary: 'Bloques de enfoque con descansos cortos para mantener la atención.', status: 'available' },
+  { id: 'kaizen', name: 'Kaizen', summary: 'Mejora continua con pasos pequeños y constantes.', status: 'available' },
+  { id: 'spaced', name: 'Repetición Espaciada', summary: 'Repasa tus preguntas en el momento justo para recordar más.', status: 'available' },
   { id: 'por-definir', name: 'Por definir', summary: 'Un nuevo método de estudio está en camino.', status: 'soon' },
 ];
 

@@ -2,7 +2,7 @@
 
 Página principal del despliegue. Proyecto React (Vite) responsive.
 
-- **Hoy:** índice de los métodos de estudio. Los habilitados enlazan a su prototipo; los que aún no lo están se muestran como «Próximamente» y no tienen enlace. Actualmente solo **Montessori** está habilitado; Pomodoro, Kaizen y «Por definir» figuran como próximamente.
+- **Hoy:** índice de los métodos de estudio. Los habilitados enlazan a su prototipo; los que aún no lo están se muestran como «Próximamente» y no tienen enlace. Actualmente están habilitados **Montessori, Pomodoro, Kaizen y Repetición Espaciada**; «Por definir» figura como próximamente.
 - **Mañana:** se reutiliza para construir el dashboard real (gestor de espacios de trabajo).
 
 ## Cómo se actualiza la lista de métodos
