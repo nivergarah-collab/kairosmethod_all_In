@@ -1,4 +1,7 @@
-/* Estructura de MainActivity.kt: Scaffold + NavigationBar. En web la app es una columna de teléfono centrada (máx. 480px de ancho). */
+/* Estructura de MainActivity.kt: Scaffold + NavigationBar. Diseño responsive por ancho de pantalla (un solo proyecto):
+   - celular (< 640px): columna de hasta 480px centrada, barra inferior (idéntico al APK);
+   - tablet (640–899px): columna fluida de hasta 760px, barra inferior y contenido en 2 columnas;
+   - PC (≥ 900px): riel de navegación lateral (compacto hasta 1099px, ancho desde 1100px) y contenido fluido de hasta 1120px en 2 columnas. */
 .app-shell { height: 100dvh; display: flex; justify-content: center; background: var(--background); }
 .app-col { width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; background: var(--background); position: relative; }
 .app-content { flex: 1; min-height: 0; position: relative; background: var(--background); color: var(--on-background); }
@@ -15,3 +18,49 @@
 .nav-item.sel { color: var(--pomo-primary); }
 .nav-item .nav-label { margin-top: 4px; font-size: 12px; line-height: 16px; letter-spacing: 0.5px; font-weight: 500; }
 .nav-badge { position: absolute; top: 2px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background: var(--pomo-primary); }
+
+.nav-brand { display: none; }
+
+/* Grupos de disposición de cada pantalla: en celular no generan caja, por lo que el flujo es el de siempre */
+.rs-grid, .rs-col { display: contents; }
+
+/* ---------- Tablet: 640–899px ---------- */
+@media (min-width: 640px) {
+  .app-col { max-width: 760px; }
+  .rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; align-items: start; width: 100%; }
+  .rs-col { display: block; min-width: 0; }
+  .at-root .rs-col { display: flex; flex-direction: column; align-items: center; }
+}
+
+/* ---------- PC: ≥ 900px ---------- */
+@media (min-width: 900px) {
+  .app-col { max-width: none; flex-direction: row; }
+  .app-screen { scrollbar-gutter: stable; }
+  /* Los diálogos (.m3-scrim) también cuelgan de .app-screen: no se limitan, cubren toda la ventana */
+  .app-screen > :not(.m3-scrim) { max-width: 1120px; margin-left: auto; margin-right: auto; }
+  .rs-grid { column-gap: 28px; }
+
+  /* La barra inferior pasa a riel lateral compacto (ícono y etiqueta, como en celular) */
+  .nav-bar {
+    order: -1; width: 96px; height: auto; padding: 20px 8px; gap: 8px;
+    border-right: 1px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);
+  }
+  .nav-item { flex: none; height: 76px; padding-top: 8px; justify-content: center; border-radius: 16px; }
+}
+
+/* ---------- PC amplio: ≥ 1100px ---------- */
+@media (min-width: 1100px) {
+  .app-screen { padding: 12px 20px 0; }
+  .nav-bar { width: 232px; flex-direction: column; align-items: stretch; gap: 6px; padding: 24px 14px; }
+  .nav-brand { display: block; padding: 6px 16px 18px; font-size: 22px; line-height: 28px; font-weight: 700; color: var(--pomo-primary); letter-spacing: 0; }
+  .nav-item { flex-direction: row; justify-content: flex-start; align-items: center; gap: 14px; height: 56px; padding: 0 18px; border-radius: 28px; text-align: left; }
+  .nav-item.sel { background: color-mix(in srgb, var(--pomo-primary) 15%, transparent); }
+  .nav-item .nav-ind { width: 24px; height: 24px; border-radius: 0; background: transparent; }
+  .nav-item.sel .nav-ind { background: transparent; }
+  .nav-item .nav-label { margin-top: 0; font-size: 14px; line-height: 20px; letter-spacing: 0.1px; }
+  .nav-badge { top: -2px; right: -3px; }
+}
+
+@media (min-width: 1280px) {
+  .rs-grid { column-gap: 36px; }
+}

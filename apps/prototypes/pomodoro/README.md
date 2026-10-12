@@ -29,7 +29,7 @@ npm run build -- --base=/<ruta>/pomodoro/
 - **Base de datos:** Room → `localStorage` (mismas tablas: perfiles, sesiones y bloques). Igual que en el APK, el estado de la configuración, la sesión en curso y las preferencias (sonido, vibración, tema) vive en memoria y se reinicia al recargar.
 - **Sonido:** el APK reproduce el tono de notificación del sistema y `ToneGenerator`; la web no tiene ese sonido, así que `alerts.js` sintetiza tonos de la misma duración y secuencia (aproximados).
 - **Vibración:** mismos patrones, con `navigator.vibrate` (solo funciona en Android/Chrome; sin amplitudes).
-- **Pantalla:** el teléfono se muestra como una columna de hasta 480 px centrada. Sin barra de estado ni botón Atrás del sistema.
+- **Pantalla:** diseño responsive por ancho, en un solo proyecto (sin código de interfaz duplicado). En celular (menos de 640 px) se ve igual que el APK: una columna de hasta 480 px centrada con barra inferior. En tablet (640–899 px) la columna crece hasta 760 px y las pantallas pasan a 2 columnas. En PC (desde 900 px) la barra inferior se vuelve un riel lateral (compacto hasta 1099 px, con etiquetas desde 1100 px) y el contenido ocupa hasta 1120 px en 2 columnas. Colores, tipografía y reglas no cambian. Sin barra de estado ni botón Atrás del sistema.
 - **Tipografía:** Roboto (variable) incluida con `@fontsource-variable/roboto`; el APK usa la fuente por defecto del sistema (Roboto en Android).
 
 ## Rarezas del APK copiadas tal cual

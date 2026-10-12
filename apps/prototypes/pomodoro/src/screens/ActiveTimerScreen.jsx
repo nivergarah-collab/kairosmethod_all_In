@@ -53,7 +53,10 @@ export function ActiveTimerScreen() {
   const currentBlock = activeBlocks.find((b) => b.index === currentBlockIndex);
 
   return (
-    <div style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 18px' }}>
+    <div className="at-root" style={{ boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 18px' }}>
+      {/* Grupos de disposición: en celular no generan caja (display: contents); en tablet/PC forman 2 columnas (ver app.css) */}
+      <div className="rs-grid">
+      <div className="rs-col">
       {/* Header with Session Topic */}
       <Card color={alpha('var(--surface-variant)', 0.5)} radius={16} style={{ width: '100%', margin: '4px 0', boxSizing: 'border-box' }}>
         <div style={{ boxSizing: 'border-box', width: '100%', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -138,7 +141,9 @@ export function ActiveTimerScreen() {
       </div>
 
       <div style={{ height: 18 }} />
+      </div>
 
+      <div className="rs-col">
       {/* Current block quick action banner */}
       {currentBlock != null && (
         <Card
@@ -222,6 +227,8 @@ export function ActiveTimerScreen() {
       ))}
 
       <div style={{ height: 32 }} />
+      </div>
+      </div>
 
       {showCancelDialog && (
         <AlertDialog

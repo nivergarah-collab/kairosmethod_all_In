@@ -43,7 +43,10 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
   return (
     <>
-      <div style={{ padding: '12px 18px', minHeight: '100%', boxSizing: 'border-box' }}>
+      <div className="sc-root" style={{ padding: '12px 18px', minHeight: '100%', boxSizing: 'border-box' }}>
+        {/* Grupos de disposición: en celular no generan caja (display: contents); en tablet/PC forman 2 columnas (ver app.css) */}
+        <div className="rs-grid">
+        <div className="rs-col">
         <UserSelectorBar user={activeUser} onSwitchUserClick={onOpenUserDialog} />
 
         {spacer(10)}
@@ -159,7 +162,9 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
         />
 
         {spacer(20)}
+        </div>
 
+        <div className="rs-col">
         <Card color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
           <div style={{ padding: 16 }}>
             <SliderRow
@@ -376,6 +381,8 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
         </Button>
 
         {spacer(28)}
+        </div>
+        </div>
       </div>
 
       {showGoalEditor && (

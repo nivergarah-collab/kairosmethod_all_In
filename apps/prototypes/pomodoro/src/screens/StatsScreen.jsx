@@ -32,6 +32,9 @@ export function StatsScreen({ onOpenUserDialog }) {
 
   return (
     <div data-testid="stats_screen" style={{ boxSizing: 'border-box', padding: '12px 18px', color: 'var(--on-surface)' }}>
+      {/* Grupos de disposición: en celular no generan caja (display: contents); en tablet/PC forman 2 columnas (ver app.css) */}
+      <div className="rs-grid">
+      <div className="rs-col">
       {/* User header & selector */}
       <UserSelectorBar user={activeUser} onSwitchUserClick={onOpenUserDialog} />
 
@@ -85,7 +88,9 @@ export function StatsScreen({ onOpenUserDialog }) {
       <WeeklyStudyProductivityCard sessions={sessions} dailyGoalMinutes={activeUser?.dailyGoalMinutes ?? 100} />
 
       <div style={{ height: 14 }} />
+      </div>
 
+      <div className="rs-col">
       {/* Individual Sessions Bar Chart (Collapsible/Secondary visualization) */}
       <Card color="var(--surface)" radius={16} border={`1px solid ${alpha('var(--outline-variant)', 0.4)}`} style={{ width: '100%' }}>
         <div style={{ padding: 16 }}>
@@ -147,6 +152,8 @@ export function StatsScreen({ onOpenUserDialog }) {
       )}
 
       <div style={{ height: 32 }} />
+      </div>
+      </div>
 
       {showGoalEditor && (
         <DailyGoalSettingDialog

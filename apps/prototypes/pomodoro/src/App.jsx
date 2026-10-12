@@ -40,6 +40,8 @@ function PomoStudyApp() {
           </div>
         </div>
         <nav className="nav-bar" data-testid="main_bottom_nav">
+          {/* Solo visible en PC (riel lateral); en celular y tablet no se muestra */}
+          <div className="nav-brand" aria-hidden="true">PomoStudy</div>
           {tabs.map((t) => {
             const selected = state.currentTab === t.id;
             return (
