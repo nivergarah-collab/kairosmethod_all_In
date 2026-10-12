@@ -1,0 +1,127 @@
+/* Tema de la app Android (ui/theme/Color.kt, Theme.kt, Type.kt) sobre Material 3 (Compose BOM 2024.09.00 = material3 1.3.0).
+   1dp = 1px. Los roles que el APK no define toman el valor por defecto de lightColorScheme()/darkColorScheme() de M3 1.3.0. */
+
+:root {
+  /* Color.kt */
+  --pomo-primary: #D9483B;
+  --pomo-primary-dark: #FF8B7D;
+  --pomo-secondary: #E28743;
+  --pomo-accent-gold: #F59E0B;
+  --break-green: #10B981;
+  --break-green-dark: #34D399;
+  --break-green-light: #D1FAE5;
+  --slate-900: #0F172A;
+  --slate-800: #1E293B;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-100: #F1F5F9;
+  --slate-50: #F8FAFC;
+  --long-break-blue: #0284C7; /* Color(0xFF0284C7) usado en varias pantallas */
+
+  /* LightColorScheme */
+  --primary: #D9483B;
+  --on-primary: #FFFFFF;
+  --primary-container: #FFDAD4;
+  --on-primary-container: #410001;
+  --secondary: #E28743;
+  --on-secondary: #FFFFFF;
+  --secondary-container: #FFE0CF;
+  --on-secondary-container: #331200;
+  --tertiary: #10B981;
+  --on-tertiary: #FFFFFF;
+  --tertiary-container: #FFD8E4;
+  --on-tertiary-container: #31111D;
+  --background: #FFFDFB;
+  --on-background: #1E293B;
+  --surface: #FFFFFF;
+  --on-surface: #1E293B;
+  --surface-variant: #F1F5F9;
+  --on-surface-variant: #64748B;
+  --surface-tint: #D9483B;
+  /* Valores por defecto de M3 */
+  --outline: #79747E;
+  --outline-variant: #CAC4D0;
+  --error: #B3261E;
+  --on-error: #FFFFFF;
+  --error-container: #F9DEDC;
+  --on-error-container: #410E0B;
+  --inverse-surface: #313033;
+  --inverse-on-surface: #F4EFF4;
+  --scrim: #000000;
+  --surface-container-lowest: #FFFFFF;
+  --surface-container-low: #F7F2FA;
+  --surface-container: #F3EDF7;
+  --surface-container-high: #ECE6F0;
+  --surface-container-highest: #E6E0E9;
+}
+
+/* DarkColorScheme */
+:root[data-theme='dark'] {
+  --primary: #FF8B7D;
+  --on-primary: #000000;
+  --primary-container: #781B12;
+  --on-primary-container: #FFDAD4;
+  --secondary: #F59E0B;
+  --on-secondary: #000000;
+  --secondary-container: #452B00;
+  --on-secondary-container: #FFDEAB;
+  --tertiary: #34D399;
+  --on-tertiary: #000000;
+  --tertiary-container: #633B48;
+  --on-tertiary-container: #FFD8E4;
+  --background: #0F172A;
+  --on-background: #F8FAFC;
+  --surface: #1E293B;
+  --on-surface: #F8FAFC;
+  --surface-variant: #1E293B;
+  --on-surface-variant: #94A3B8;
+  --surface-tint: #FF8B7D;
+  --outline: #938F99;
+  --outline-variant: #49454F;
+  --error: #F2B8B5;
+  --on-error: #601410;
+  --error-container: #8C1D18;
+  --on-error-container: #F9DEDC;
+  --inverse-surface: #E6E0E9;
+  --inverse-on-surface: #322F35;
+  --surface-container-lowest: #0F0D13;
+  --surface-container-low: #1D1B20;
+  --surface-container: #211F26;
+  --surface-container-high: #2B2930;
+  --surface-container-highest: #36343B;
+  color-scheme: dark;
+}
+:root[data-theme='light'] { color-scheme: light; }
+
+/* Typography.kt: solo bodyLarge se redefine; el resto es la escala por defecto de M3 1.3.0 */
+.t-displayLarge  { font-size: 57px; line-height: 64px; letter-spacing: -0.25px; font-weight: 400; }
+.t-displayMedium { font-size: 45px; line-height: 52px; letter-spacing: 0; font-weight: 400; }
+.t-displaySmall  { font-size: 36px; line-height: 44px; letter-spacing: 0; font-weight: 400; }
+.t-headlineLarge  { font-size: 32px; line-height: 40px; letter-spacing: 0; font-weight: 400; }
+.t-headlineMedium { font-size: 28px; line-height: 36px; letter-spacing: 0; font-weight: 400; }
+.t-headlineSmall  { font-size: 24px; line-height: 32px; letter-spacing: 0; font-weight: 400; }
+.t-titleLarge  { font-size: 22px; line-height: 28px; letter-spacing: 0; font-weight: 400; }
+.t-titleMedium { font-size: 16px; line-height: 24px; letter-spacing: 0.15px; font-weight: 500; }
+.t-titleSmall  { font-size: 14px; line-height: 20px; letter-spacing: 0.1px; font-weight: 500; }
+.t-bodyLarge  { font-size: 16px; line-height: 24px; letter-spacing: 0.5px; font-weight: 400; }
+.t-bodyMedium { font-size: 14px; line-height: 20px; letter-spacing: 0.25px; font-weight: 400; }
+.t-bodySmall  { font-size: 12px; line-height: 16px; letter-spacing: 0.4px; font-weight: 400; }
+.t-labelLarge  { font-size: 14px; line-height: 20px; letter-spacing: 0.1px; font-weight: 500; }
+.t-labelMedium { font-size: 12px; line-height: 16px; letter-spacing: 0.5px; font-weight: 500; }
+.t-labelSmall  { font-size: 11px; line-height: 16px; letter-spacing: 0.5px; font-weight: 500; }
+
+/* Pesos de Compose */
+.w-normal { font-weight: 400; } .w-medium { font-weight: 500; } .w-semibold { font-weight: 600; }
+.w-bold { font-weight: 700; } .w-extrabold { font-weight: 800; }
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Roboto Variable', Roboto, system-ui, sans-serif;
+  background: var(--background);
+  color: var(--on-background);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; }

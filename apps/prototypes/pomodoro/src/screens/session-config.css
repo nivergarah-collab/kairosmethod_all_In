@@ -1,0 +1,6 @@
+.sc-hscroll { display: flex; width: 100%; overflow-x: auto; scrollbar-width: none; }
+.sc-hscroll::-webkit-scrollbar { display: none; }
+.sc-hscroll > * { flex: none; white-space: nowrap; }
+.sc-expand { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms, visibility 0s linear 300ms; }
+.sc-expand.open { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition: grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms, visibility 0s; }
+.sc-expand > div { overflow: hidden; min-height: 0; }

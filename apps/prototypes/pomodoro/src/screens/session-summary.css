@@ -1,0 +1,6 @@
+/* Campo de texto multilínea (OutlinedTextField minLines=3, maxLines=5) con el aspecto de .m3-otf */
+.ssd-notes textarea {
+  display: block; box-sizing: border-box; resize: none; overflow-y: auto; height: 104px; min-height: 104px; max-height: 152px;
+}
+.ssd-notes textarea::placeholder { color: var(--on-surface-variant); opacity: 0; transition: opacity 0.15s; }
+.ssd-notes.floated textarea::placeholder { opacity: 1; }
