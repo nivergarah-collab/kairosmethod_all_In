@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { getActivePlants } from './state.js';
 import { getGardenDate, localDayKey } from './time.js';
 import { SpatialGarden } from './components/SpatialGarden.jsx';
@@ -7,11 +7,42 @@ import { Herbarium } from './components/Herbarium.jsx';
 import { Nursery } from './components/Nursery.jsx';
 import { PlantForm } from './components/PlantForm.jsx';
 import { SettingsPanel } from './components/SettingsPanel.jsx';
+import { Tutorial } from './tutorial/Tutorial.jsx';
+import { markTutorialSeen, shouldAutoStart } from './tutorial/storage.js';
+import { createTutorialGarden, TOUR_PLANT_ID } from './tutorial/sampleGarden.js';
 
-export default function App({ garden, dispatch, storageError }) {
+const ignoreTourAction = () => {};
+
+export default function App({ garden: savedGarden, dispatch: savedDispatch, storageError }) {
   const [selectedPlantId, setSelectedPlantId] = useState(null);
   const [activeView, setActiveView] = useState('garden');
   const [notice, setNotice] = useState('');
+  // Recorrido guiado: usa un jardín de ejemplo solo en memoria; el jardín real y su almacenamiento no se tocan.
+  const [tourOpen, setTourOpen] = useState(() => shouldAutoStart());
+  const [tourVariant, setTourVariant] = useState('plants');
+  const [sceneKey, setSceneKey] = useState(0);
+  const tourGarden = useMemo(() => (tourOpen ? createTutorialGarden(tourVariant, new Date()) : null), [tourOpen, tourVariant]);
+  const garden = tourGarden ?? savedGarden;
+  const dispatch = tourGarden ? ignoreTourAction : savedDispatch;
+  const tourController = useMemo(() => ({
+    setView: setActiveView,
+    setVariant: setTourVariant,
+    setDetail: (open) => setSelectedPlantId(open ? TOUR_PLANT_ID : null),
+    resetScene: () => setSceneKey((key) => key + 1),
+  }), []);
+  const openTour = useCallback(() => {
+    setTourVariant('plants');
+    setTourOpen(true);
+  }, []);
+  const closeTour = useCallback((status) => {
+    markTutorialSeen(status);
+    setTourOpen(false);
+    setTourVariant('plants');
+    setActiveView('garden');
+    setSelectedPlantId(null);
+    setNotice('');
+    setSceneKey((key) => key + 1);
+  }, []);
   const gardenNow = getGardenDate(garden, new Date());
   const dayKey = localDayKey(gardenNow);
   const selectedPlant = garden.plants.find(({ id }) => id === selectedPlantId) ?? null;
@@ -52,6 +83,7 @@ export default function App({ garden, dispatch, storageError }) {
     <>
       {activeView === 'garden' ? (
         <SpatialGarden
+          key={sceneKey}
           garden={garden}
           dayKey={dayKey}
           notice={notice}
@@ -61,16 +93,17 @@ export default function App({ garden, dispatch, storageError }) {
           onNavigate={setActiveView}
           onAddPlant={addPlant}
           onDemoAction={runDemoAction}
+          onHelp={openTour}
           dispatch={dispatch}
         />
       ) : activeView === 'nursery' ? (
-        <Nursery garden={garden} onBack={() => setActiveView('garden')} onCreate={addPlant} onSimulateWeek={() => dispatch({ type: 'SIMULATE_HEALTHY_WEEK' })} />
+        <Nursery garden={garden} onHelp={openTour} onBack={() => setActiveView('garden')} onCreate={addPlant} onSimulateWeek={() => dispatch({ type: 'SIMULATE_HEALTHY_WEEK' })} />
       ) : activeView === 'herbarium' ? (
-        <Herbarium plants={garden.herbarium} onBack={() => setActiveView('garden')} onReplicate={replicate} onDelete={deleteHerbariumEntry} />
+        <Herbarium plants={garden.herbarium} onHelp={openTour} onBack={() => setActiveView('garden')} onReplicate={replicate} onDelete={deleteHerbariumEntry} />
       ) : activeView === 'settings' ? (
-        <SettingsPanel garden={garden} storageError={storageError} onBack={() => setActiveView('garden')} onImport={importGarden} onNewGarden={startNewGarden} />
+        <SettingsPanel garden={garden} storageError={storageError} onHelp={openTour} onBack={() => setActiveView('garden')} onImport={importGarden} onNewGarden={startNewGarden} />
       ) : (
-        <PlantForm onSave={addPlant} onCancel={() => setActiveView('garden')} />
+        <PlantForm onSave={addPlant} onCancel={() => setActiveView('garden')} onHelp={openTour} />
       )}
       {selectedPlant && activeView === 'garden' && (
         <PlantDetail
@@ -82,6 +115,7 @@ export default function App({ garden, dispatch, storageError }) {
           onClose={closeDetail}
         />
       )}
+      {tourOpen && <Tutorial controller={tourController} onClose={closeTour} />}
     </>
   );
 }

@@ -27,6 +27,16 @@ npm run build
 3. Crea microacciones propias desde **Nueva planta**. El vivero ofrece dos semillas adicionales después de una semana saludable simulada.
 4. Abre **Ajustes** para exportar un archivo JSON, revisar una copia antes de importarla o comenzar un jardín nuevo.
 
+## Tutorial
+
+Versión 0.2.0. La primera vez que se entra, un recorrido guiado de 14 pasos oscurece la pantalla y resalta cada parte del jardín: la elección de semillas, los cuatro rincones, el cuidado diario, los detalles de la planta, ver detalles y organizar, el reloj virtual, el menú, la creación de microacciones, el Vivero, el Herbario y los Ajustes.
+
+- Se puede saltar en cualquier paso («Saltar tutorial» o Escape) y se navega con «Anterior», «Siguiente» y las flechas del teclado.
+- El botón **?** («Ver tutorial»), junto a la fecha en la escena y en la cabecera de las demás vistas, vuelve a abrirlo.
+- Usa plantas de ejemplo solo en memoria: no cambia ni guarda nada en tu jardín. Al cerrar, vuelves a la vista inicial.
+- Recuerda que ya se vio en `localStorage` con la clave `kairos_kaizen_tutorial_v1`, distinta de la de los datos (`kaizen-garden-v2`). Si el almacenamiento falla, la app sigue funcionando y el tutorial no se abre solo.
+- El código vive en `src/tutorial/` (pasos, avance, persistencia y posición de la tarjeta sin React, con pruebas en `src/tutorial/tutorial.test.js`); los elementos resaltados se marcan con atributos `data-tour`.
+
 ## Modo demo
 
 Los controles demo permiten avanzar un día o una semana, simular una semana saludable, simular una recuperación y volver a la fecha local real. Solo cambian el reloj virtual guardado en el jardín; nunca ajustan la hora del dispositivo. Al volver a hoy, las fechas futuras creadas durante la demo dejan de bloquear el cuidado del día real.

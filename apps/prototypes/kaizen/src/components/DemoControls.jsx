@@ -4,7 +4,7 @@ export function DemoControls({ garden, dayKey, onAction }) {
   const demo = garden.clockMode === 'demo';
   const shownDate = new Intl.DateTimeFormat('es-CL', { dateStyle: 'long' }).format(dateFromDayKey(dayKey));
   return (
-    <section className="demo-controls" aria-labelledby="demo-title">
+    <section className="demo-controls" data-tour="demo-panel" aria-labelledby="demo-title">
       <div><p className="eyebrow">Reloj virtual</p><h2 id="demo-title">Prueba el paso del tiempo</h2><p>La demo solo cambia el jardín guardado; no modifica la hora de tu dispositivo.</p></div>
       <div className="demo-actions">
         <span className={`clock-chip ${demo ? 'is-demo' : ''}`} role="status">{demo ? `Demo · ${shownDate}` : 'Reloj real'}</span>
