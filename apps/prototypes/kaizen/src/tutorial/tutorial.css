@@ -1,0 +1,75 @@
+/* Recorrido guiado: reutiliza la paleta de la escena (verde profundo, dorado, crema) y su tipografía. */
+.tour-root {
+  --tour-bg: #0f3336;
+  --tour-line: #ffffff40;
+  --tour-ink: #f5eee0;
+  --tour-title: #fff4db;
+  --tour-muted: #c4d7cf;
+  --tour-gold: #edbd69;
+  --tour-gold-soft: #eac879;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: var(--tour-ink);
+}
+.tour-root[data-ready="false"] .tour-card { visibility: hidden; }
+.tour-blocker { position: absolute; inset: 0; background: transparent; touch-action: none; }
+.tour-spotlight { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.tour-dim { fill: #05282c; fill-opacity: 0.82; }
+.tour-ring { fill: none; stroke: var(--tour-gold); stroke-width: 2; stroke-opacity: 0.9; }
+.tour-card {
+  position: absolute;
+  box-sizing: border-box;
+  max-width: calc(100vw - 24px);
+  overflow-y: auto;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--tour-line);
+  border-radius: 18px;
+  background: var(--tour-bg);
+  box-shadow: 0 18px 50px #02171a99;
+  outline: none;
+}
+.tour-card h2 { margin: 0 0 8px; color: var(--tour-title); font: normal 24px/1.15 Georgia, 'Times New Roman', serif; }
+.tour-body { margin: 0 0 16px; color: var(--tour-muted); font-size: 13px; line-height: 1.55; }
+.tour-progress { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; color: var(--tour-gold-soft); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+.tour-dots { display: inline-flex; gap: 4px; }
+.tour-dots i { width: 5px; height: 5px; border-radius: 50%; background: #ffffff30; }
+.tour-dots i.is-done { background: #ffffff80; }
+.tour-dots i.is-current { width: 14px; border-radius: 4px; background: var(--tour-gold); }
+.tour-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.tour-nav { display: inline-flex; gap: 8px; margin-left: auto; }
+.tour-card button { cursor: pointer; }
+button.tour-button, button.tour-skip { font-family: inherit; }
+.tour-button { min-height: 38px; padding: 0 16px; border: 1px solid #ffffff35; border-radius: 22px; background: transparent; color: #dce9df; font-size: 12px; }
+.tour-button:hover:not(:disabled) { background: #ffffff14; }
+.tour-button:disabled { opacity: 0.4; cursor: default; }
+.tour-card .tour-primary { border-color: var(--tour-gold); background: var(--tour-gold); color: #163d35; font-weight: 650; }
+.tour-card .tour-primary:hover { background: #f3cb82; }
+.tour-skip { padding: 8px 4px; border: 0; background: transparent; color: #d5e4dc; font-size: 11px; text-decoration: underline; text-underline-offset: 2px; }
+.tour-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.tour-card:focus-visible, .tour-card button:focus-visible { outline: 3px solid #bd684c; outline-offset: 2px; }
+
+/* Botón «?» */
+.tour-help { display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0; border-radius: 50%; font: 700 17px/1 Georgia, 'Times New Roman', serif; cursor: pointer; }
+.space-top-tools .tour-help { padding: 0; border-radius: 50%; border: 1px solid #ffffff80; background: #f7f0df; color: #183d36; font-size: 17px; }
+.space-top-tools .tour-help:hover { background: #fff8e8; }
+.masthead-actions { display: inline-flex; align-items: center; gap: 10px; }
+.masthead-actions .tour-help { border: 1px solid #dfe3d9; background: transparent; color: var(--green); }
+.masthead-actions .tour-help:hover { background: #eef1e9; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tour-root[data-ready="true"] .tour-card { animation: tour-pop 0.22s ease-out; }
+  @keyframes tour-pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+@media (max-width: 760px) {
+  .tour-card { padding: 16px 16px 14px; }
+  .tour-card h2 { font-size: 21px; }
+  .tour-body { font-size: 12.5px; margin-bottom: 14px; }
+  .space-top-tools .tour-help { width: 34px; height: 34px; }
+}
+@media (max-height: 460px) {
+  .tour-card { padding: 12px 16px; }
+  .tour-card h2 { font-size: 19px; margin-bottom: 4px; }
+  .tour-body { margin-bottom: 10px; }
+}

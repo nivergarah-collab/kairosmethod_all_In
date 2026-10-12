@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { parseGardenJson, serializeGarden } from '../persistence.js';
+import { HelpButton } from '../tutorial/HelpButton.jsx';
 
 function downloadGarden(garden) {
   const blob = new Blob([serializeGarden(garden)], { type: 'application/json' });
@@ -11,7 +12,7 @@ function downloadGarden(garden) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function SettingsPanel({ garden, storageError, onBack, onImport, onNewGarden }) {
+export function SettingsPanel({ garden, storageError, onHelp, onBack, onImport, onNewGarden }) {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState('');
   const [confirmNew, setConfirmNew] = useState(false);
@@ -48,8 +49,8 @@ export function SettingsPanel({ garden, storageError, onBack, onImport, onNewGar
 
   return (
     <main className="garden-shell feature-page" id="garden-top" aria-labelledby="settings-title">
-      <header className="site-masthead"><a className="wordmark" href="#garden-top"><span className="wordmark-mark" aria-hidden="true">✳</span><span>jardín <strong>kaizen</strong></span></a><button className="button button-quiet" type="button" onClick={onBack}>Volver al jardín</button></header>
-      <section className="feature-card settings-card">
+      <header className="site-masthead"><a className="wordmark" href="#garden-top"><span className="wordmark-mark" aria-hidden="true">✳</span><span>jardín <strong>kaizen</strong></span></a><div className="masthead-actions"><HelpButton onClick={onHelp} /><button className="button button-quiet" type="button" onClick={onBack}>Volver al jardín</button></div></header>
+      <section className="feature-card settings-card" data-tour="settings">
         <p className="eyebrow">Este dispositivo</p><h1 id="settings-title">Ajustes y copias</h1>
         {storageError && <p className="inline-error" role="alert">El almacenamiento local está fallando. Descarga una copia JSON para resguardar el jardín.</p>}
         {message && <p className="garden-notice" role="status">{message}</p>}

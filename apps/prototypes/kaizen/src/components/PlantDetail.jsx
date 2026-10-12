@@ -117,7 +117,7 @@ export function PlantDetail({ plant, dayKey, now = new Date(), dispatch, onClose
 
   return (
     <div className="detail-backdrop" onMouseDown={(event) => { if (!confirmFreeze && event.target === event.currentTarget) onClose(); }}>
-      <section className="plant-detail" role={confirmFreeze ? 'alertdialog' : 'dialog'} aria-modal="true" aria-labelledby={confirmFreeze ? 'freeze-confirm-title' : 'plant-detail-title'} data-plant-detail tabIndex={-1}>
+      <section className="plant-detail" role={confirmFreeze ? 'alertdialog' : 'dialog'} aria-modal="true" aria-labelledby={confirmFreeze ? 'freeze-confirm-title' : 'plant-detail-title'} data-plant-detail data-tour="plant-detail" tabIndex={-1}>
         <button className="detail-close" type="button" onClick={onClose} ref={closeButtonRef} aria-label="Cerrar detalles">×</button>
         {confirmFreeze ? (
           <>

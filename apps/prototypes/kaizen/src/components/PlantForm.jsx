@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FAMILIES } from '../state.js';
+import { HelpButton } from '../tutorial/HelpButton.jsx';
 
-export function PlantForm({ onSave, onCancel }) {
+export function PlantForm({ onSave, onCancel, onHelp }) {
   const [familyId, setFamilyId] = useState(FAMILIES[0].id);
   const family = FAMILIES.find(({ id }) => id === familyId);
   const [form, setForm] = useState({
@@ -21,8 +22,8 @@ export function PlantForm({ onSave, onCancel }) {
 
   return (
     <main className="garden-shell feature-page" id="garden-top" aria-labelledby="plant-form-title">
-      <FeatureMasthead onCancel={onCancel} backLabel="Volver al jardín" />
-      <section className="feature-card">
+      <FeatureMasthead onCancel={onCancel} onHelp={onHelp} backLabel="Volver al jardín" />
+      <section className="feature-card" data-tour="plant-form">
         <p className="eyebrow">Una semilla nueva</p>
         <h1 id="plant-form-title">Crea una microacción</h1>
         <p>Elige algo pequeño, claro y fácil de repetir.</p>
@@ -50,6 +51,6 @@ export function PlantForm({ onSave, onCancel }) {
   );
 }
 
-function FeatureMasthead({ onCancel, backLabel }) {
-  return <header className="site-masthead"><a className="wordmark" href="#garden-top"><span className="wordmark-mark" aria-hidden="true">✳</span><span>jardín <strong>kaizen</strong></span></a><button className="button button-quiet" type="button" onClick={onCancel}>{backLabel}</button></header>;
+function FeatureMasthead({ onCancel, onHelp, backLabel }) {
+  return <header className="site-masthead"><a className="wordmark" href="#garden-top"><span className="wordmark-mark" aria-hidden="true">✳</span><span>jardín <strong>kaizen</strong></span></a><div className="masthead-actions"><HelpButton onClick={onHelp} /><button className="button button-quiet" type="button" onClick={onCancel}>{backLabel}</button></div></header>;
 }
