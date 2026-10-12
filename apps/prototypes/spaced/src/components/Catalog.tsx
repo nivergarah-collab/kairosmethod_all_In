@@ -23,7 +23,7 @@ export function Catalog({ onEdit }: Props) {
   }
 
   return (
-    <aside className="catalog" aria-label="Mis preguntas">
+    <aside className="catalog" aria-label="Mis preguntas" data-tour="catalog">
       <div className="catalog-head">
         <span className="catalog-title">Mis preguntas</span>
         <span className="catalog-count">{cards.length}</span>

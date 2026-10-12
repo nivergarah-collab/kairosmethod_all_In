@@ -58,6 +58,22 @@ npm run preview    # sirve el build
 La **meta del día**, la **racha** y el **periodo** se guardan solos en el
 navegador. En **Mis preguntas** (catálogo) puedes editar o borrar tus fichas.
 
+## Tutorial
+
+Versión 3.1.0. La primera vez que se entra, se abre un recorrido guiado de 9
+pasos que oscurece la pantalla y resalta cada parte: fichas de hoy, ficha
+nueva, cintas, libro, sellos, agenda, «Mis preguntas», meta/racha/fecha
+objetivo y sonido. Se puede saltar, volver atrás o cerrar con Escape (flechas
+← → también navegan). El botón **?** de la barra superior («Ver tutorial») lo
+vuelve a abrir.
+
+- Muestra **fichas de ejemplo solo en memoria**: no se guardan ni tocan tus
+  datos reales.
+- Recuerda que ya se vio con la clave `kairos_spaced_tutorial_v1` (distinta de
+  la de datos); si el almacenamiento está bloqueado, la app funciona igual.
+- Código en `src/tutorial/` (lógica pura en `engine.ts`, pasos en `steps.ts`,
+  ejemplos en `demo.ts`); los elementos se marcan con `data-tour="..."`.
+
 ## El método (investigación resumida)
 
 Basado en la especificación original de SM-2 de P.A. Wozniak (SuperMemo,
@@ -126,13 +142,14 @@ spaced-repetition/
 │   │   └── StoreContext.tsx provider + hooks
 │   └── components/         Topbar, TodayStrip, Ribbons, ReviewBook,
 │                           EmptyBook, Agenda, Notepad, CardForm, Catalog
-└── tests/                  Vitest: dates, scheduler, storage, reducer
+├── src/tutorial/           tutorial guiado (Tour, engine, steps, demo)
+└── tests/                  Vitest: dates, scheduler, storage, reducer, tutorial
 ```
 
 ## Pruebas
 
-`npm run test` corre **49 pruebas** con Vitest sobre la lógica pura (fechas,
-SM-2, persistencia y migración, reducer), sin navegador. En los tests el
+`npm run test` corre **67 pruebas** con Vitest sobre la lógica pura (fechas,
+SM-2, persistencia y migración, reducer, tutorial), sin navegador. En los tests el
 reducer recibe `today` por acción, así que son deterministas.
 
 ## Decisiones tomadas

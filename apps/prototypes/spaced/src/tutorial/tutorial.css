@@ -1,0 +1,175 @@
+/* Tutorial guiado: reutiliza las variables y el aspecto de cuaderno/fichero de styles.css. */
+
+.tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tour-blocker {
+  position: fixed;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+}
+
+.tour-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 32, 16, 0.62);
+}
+
+.tour-spot {
+  position: fixed;
+  border-radius: var(--radius-lg);
+  outline: 2px solid var(--brass);
+  outline-offset: 0;
+  box-shadow: 0 0 0 9999px rgba(43, 32, 16, 0.62);
+}
+
+.tour-card {
+  position: fixed;
+  width: min(380px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  pointer-events: auto;
+  padding: 16px 18px 14px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, #D9E3EE 27px 28px),
+    linear-gradient(180deg, #FEFBEC, #FBF6DF);
+  border: 1px solid #E4D9B4;
+  border-top: 4px solid var(--brass);
+  border-radius: 4px;
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+  outline: none;
+  animation: tour-pop 0.22s ease both;
+}
+
+.tour-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tour-progress {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tour-badge {
+  font-family: var(--font-hand);
+  font-size: 14px;
+  color: var(--accent-dark);
+}
+
+.tour-title {
+  margin: 6px 0 4px;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.tour-text {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+}
+
+.tour-nav {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.tour-card .tour-btn {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 14px;
+  min-height: 38px;
+}
+
+.tour-card .tour-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  filter: none;
+}
+
+.tour-skip {
+  padding: 6px 2px;
+  min-height: 38px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tour-skip:hover {
+  color: var(--ink);
+}
+
+.tour-card button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes tour-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-card {
+    animation: none;
+  }
+}
+
+/* Botón «?» de la barra superior */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip-help {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
