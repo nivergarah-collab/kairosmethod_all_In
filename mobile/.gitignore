@@ -1,0 +1,4 @@
+# Todo esto se regenera en cada build (ver README.md): no se versiona.
+node_modules/
+www/
+android/

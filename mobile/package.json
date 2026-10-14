@@ -1,0 +1,15 @@
+{
+  "name": "kairos-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Empaquetado Android (Capacitor) del sitio construido con infra/scripts/build-site.sh. No contiene código de la interfaz.",
+  "scripts": {
+    "test": "node --test \"scripts/*.test.mjs\"",
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "6.2.1",
+    "@capacitor/cli": "6.2.1",
+    "@capacitor/core": "6.2.1"
+  }
+}
