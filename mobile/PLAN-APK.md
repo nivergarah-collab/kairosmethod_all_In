@@ -2,9 +2,9 @@
 
 ## Resumen vivo
 - Carpeta elegida: `mobile/` (en ambos repos). Workflow: `.github/workflows/build-apk.yml`.
-- Estado repo principal: código y pruebas listos; PR #12 abierta. Esperando merge de Nicolás.
-- Estado repo anexo: código y pruebas listos; PR #73 abierta (su PLAN vive en el anexo). Esperando merge.
-- **APK COMPLETO en ambos repos: NO todavía.**
+- Estado repo principal: PR #12 fusionada; workflow `build-apk` corrió con éxito y el Release `apk-latest` tiene el APK.
+- Estado repo anexo: PR #73 fusionada; workflow corrió con éxito y el Release `apk-latest` tiene el APK.
+- **APK COMPLETO en ambos repos.**
 
 ## Checklist
 - [x] Lock `lock/app-apk` en ambos repos
@@ -14,7 +14,7 @@
 - [x] Principal: `cap add android` + `sync` verificados; PR abierta
 - [x] Anexo: `mobile/` + workflow `build-apk.yml` (sitio con `node sitio/construir.mjs`)
 - [x] Anexo: prueba Chromium (21 páginas sin errores) y PR abierta
-- [ ] Tras el merge: revisar por API que el workflow corrió y el Release `apk-latest` existe; corregir con PR nueva si falló
+- [x] Tras el merge: revisar por API que el workflow corrió y el Release `apk-latest` existe; corregir con PR nueva si falló
 
 ## Decisiones / lecturas de duda
 - Capacitor 6 (no 7) para cumplir «JDK 17» del encargo.
@@ -27,3 +27,4 @@
 
 ## Historial
 - 2026-10-14 02:58–03:12 (disparo 1, ~14 min efectivos): lock, `mobile/`, workflow, pruebas; PR #12 (principal) y PR #73 (anexo). Pendiente: merge de Nicolás y primer run del workflow (no se pudo compilar el apk localmente por 403 a dl.google.com/services.gradle.org).
+- 2026-10-14 08:59–09:05 (disparo 2, ~6 min): verificado por API que ambos workflows corrieron en success y ambos Releases `apk-latest` contienen `kairos-latest.apk`. Tarea completa.
