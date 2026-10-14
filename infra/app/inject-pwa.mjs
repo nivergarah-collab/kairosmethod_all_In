@@ -142,7 +142,7 @@ export function renderIcon(size, bg, { maskable }) {
 }
 
 // ---------- service worker ----------
-export function buildServiceWorker({ base, version }) {
+export function buildServiceWorker({ base, version, precache = [] }) {
   const scope = base + '/';
   return `// Service worker generado por infra/app/inject-pwa.mjs (no editar a mano). Versión del build: ${version}
 // HTML y todo lo que no tiene hash: red primero (con respaldo en caché). /assets/ (nombres con hash): caché primero.
@@ -150,10 +150,14 @@ const VERSION = ${JSON.stringify(version)};
 const CACHE = 'kairos-pwa-' + VERSION;
 const SCOPE = ${JSON.stringify(scope)};
 const NETWORK_TIMEOUT_MS = 4000;
+// Páginas y recursos que ellas referencian: se guardan al instalar para que la app abra sin conexión.
+const PRECACHE = ${JSON.stringify([scope, scope + 'manifest.webmanifest', ...precache], null, 2)};
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll([SCOPE, SCOPE + 'manifest.webmanifest'])).catch(() => {}).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then((c) => Promise.allSettled(PRECACHE.map((u) => c.add(new Request(u, { cache: 'reload' })))))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -290,16 +294,21 @@ export function injectPwa(opts) {
   });
 
   // 1) Calcular todo en memoria; 2) escribir archivos nuevos; 3) al final, editar los index.html.
+  const htmls = listFiles(dir).filter((f) => f.endsWith(`${sep}index.html`));
+  const precache = [...new Set(htmls.flatMap((f) => {
+    const rel = relative(dir, f).split(sep).join('/').replace(/index\.html$/, '');
+    const refs = [...readFileSync(f, 'utf8').matchAll(/(?:src|href)=["'](\/[^"']+)["']/g)].map((m) => m[1]);
+    return [`${base}/${rel}`, ...refs.filter((u) => u.startsWith(base + '/') && !u.includes('#') && /\.(js|css|png|svg|webp|jpg|woff2?)$/.test(u))];
+  }))].filter((u) => u !== base + '/');
   const files = {
     'manifest.webmanifest': JSON.stringify(manifest, null, 2) + '\n',
-    'sw.js': buildServiceWorker({ base, version }),
+    'sw.js': buildServiceWorker({ base, version, precache }),
     'icon-192.png': renderIcon(192, bg, { maskable: false }),
     'icon-512.png': renderIcon(512, bg, { maskable: false }),
     'icon-maskable-192.png': renderIcon(192, bg, { maskable: true }),
     'icon-maskable-512.png': renderIcon(512, bg, { maskable: true }),
     'apple-touch-icon.png': renderIcon(180, bg, { maskable: true }),
   };
-  const htmls = listFiles(dir).filter((f) => f.endsWith(`${sep}index.html`) || f === join(dir, 'index.html'));
   const edited = htmls.map((f) => [f, injectHtml(readFileSync(f, 'utf8'), { base, themeColor })]);
   for (const [n, c] of Object.entries(files)) writeFileSync(join(dir, n), c);
   JSON.parse(readFileSync(join(dir, 'manifest.webmanifest'), 'utf8')); // válido
