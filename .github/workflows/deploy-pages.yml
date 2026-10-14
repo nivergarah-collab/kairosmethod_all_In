@@ -37,6 +37,16 @@ jobs:
           REQUIRED_PROTOTYPES: ${{ vars.PAGES_REQUIRED_PROTOTYPES }}
       - name: Verify Pages artifact is complete
         run: test -s dist/index.html && test -d dist/prototypes
+      # PWA (instalable como aplicación). Paso opcional y a prueba de fallos: si el script falla,
+      # se publica la página sin PWA y se avisa en el log. Para revertir: borrar este paso.
+      - name: Inyectar PWA
+        continue-on-error: true
+        run: |
+          if node infra/app/inject-pwa.mjs --dir dist --base "/${GITHUB_REPOSITORY#*/}" && test -s dist/manifest.webmanifest; then
+            echo "PWA inyectada en dist/."
+          else
+            echo "::warning::No se pudo inyectar la PWA; se publica la página sin ella."
+          fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
