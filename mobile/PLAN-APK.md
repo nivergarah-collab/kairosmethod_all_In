@@ -2,8 +2,8 @@
 
 ## Resumen vivo
 - Carpeta elegida: `mobile/` (en ambos repos). Workflow: `.github/workflows/build-apk.yml`.
-- Estado repo principal: código y pruebas listos; PR abierta (ver historial). Esperando merge de Nicolás.
-- Estado repo anexo: ver checklist.
+- Estado repo principal: código y pruebas listos; PR #12 abierta. Esperando merge de Nicolás.
+- Estado repo anexo: código y pruebas listos; PR #73 abierta (su PLAN vive en el anexo). Esperando merge.
 - **APK COMPLETO en ambos repos: NO todavía.**
 
 ## Checklist
@@ -12,8 +12,8 @@
 - [x] Principal: workflow `build-apk.yml` (YAML válido, mismos filtros de rutas que Pages más los propios)
 - [x] Principal: prueba Chromium (portal + 4 prototipos, base `/`, servidor que imita la WebView)
 - [x] Principal: `cap add android` + `sync` verificados; PR abierta
-- [ ] Anexo: `mobile/` + workflow `build-apk.yml` (sitio con `node sitio/construir.mjs`)
-- [ ] Anexo: prueba Chromium y PR abierta
+- [x] Anexo: `mobile/` + workflow `build-apk.yml` (sitio con `node sitio/construir.mjs`)
+- [x] Anexo: prueba Chromium (21 páginas sin errores) y PR abierta
 - [ ] Tras el merge: revisar por API que el workflow corrió y el Release `apk-latest` existe; corregir con PR nueva si falló
 
 ## Decisiones / lecturas de duda
@@ -26,4 +26,4 @@
 - No se pudo compilar el APK localmente: `dl.google.com` y `services.gradle.org` devuelven 403 desde este entorno (sin Android SDK). Se verificó hasta `cap add android`/`sync`.
 
 ## Historial
-- 2026-10-14 02:58–… (disparo 1): lock, `mobile/`, workflow, pruebas, PR principal.
+- 2026-10-14 02:58–03:12 (disparo 1, ~14 min efectivos): lock, `mobile/`, workflow, pruebas; PR #12 (principal) y PR #73 (anexo). Pendiente: merge de Nicolás y primer run del workflow (no se pudo compilar el apk localmente por 403 a dl.google.com/services.gradle.org).
