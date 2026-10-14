@@ -2,7 +2,8 @@
 // Inyecta la PWA (manifest, íconos, service worker y etiquetas) sobre una carpeta de salida ya construida.
 // No toca el código fuente: solo agrega archivos a <dir> y etiquetas a sus index.html. Solo Node estándar.
 // Uso: node infra/app/inject-pwa.mjs --dir dist --base /mi-repo [--name KairosMethod --short-name Kairos
-//        --description "..." --theme-color "#1d1b18" --background-color "#1d1b18" --lang es]
+//        --description "..." --theme-color "#1d1b18" --background-color "#1d1b18" --lang es --precache-depth 2]
+//   (--precache-depth: hasta cuántas carpetas de profundidad se guardan al instalar para uso sin conexión)
 // BASE_PATH (variable de entorno) se usa si no se pasa --base. Base vacío = sitio en la raíz.
 // Si algo falla, termina con código 1 sin dejar etiquetas a medias (los index.html se escriben al final).
 import { createHash } from 'node:crypto';
@@ -295,8 +296,10 @@ export function injectPwa(opts) {
 
   // 1) Calcular todo en memoria; 2) escribir archivos nuevos; 3) al final, editar los index.html.
   const htmls = listFiles(dir).filter((f) => f.endsWith(`${sep}index.html`));
+  const maxDepth = Number(opts.precacheDepth ?? 2);
   const precache = [...new Set(htmls.flatMap((f) => {
     const rel = relative(dir, f).split(sep).join('/').replace(/index\.html$/, '');
+    if (rel.split('/').filter(Boolean).length > maxDepth) return [];
     const refs = [...readFileSync(f, 'utf8').matchAll(/(?:src|href)=["'](\/[^"']+)["']/g)].map((m) => m[1]);
     return [`${base}/${rel}`, ...refs.filter((u) => u.startsWith(base + '/') && !u.includes('#') && /\.(js|css|png|svg|webp|jpg|woff2?)$/.test(u))];
   }))].filter((u) => u !== base + '/');
