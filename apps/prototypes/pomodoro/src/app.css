@@ -43,6 +43,8 @@
   .app-screen { scrollbar-gutter: stable; }
   /* Los diálogos (.m3-scrim) también cuelgan de .app-screen: no se limitan, cubren toda la ventana */
   .app-screen > :not(.m3-scrim) { max-width: 1120px; margin-left: auto; margin-right: auto; }
+  /* Configurar usa todo el ancho útil, también en monitores ultrapanorámicos. */
+  .app-screen-config > :not(.m3-scrim) { width: 100%; max-width: none; }
   .rs-grid { column-gap: 28px; }
 
   /* La barra inferior pasa a riel lateral compacto (ícono y etiqueta, como en celular) */

@@ -1,0 +1,45 @@
+/* Visión Calma: atardecer en el escritorio. Colores propios de la visión, acotados a .vc
+   (no se comparten con la página principal). Claro/oscuro sigue al tema de la app. */
+.vc {
+  --vc-fondo: #F3EDE8; --vc-papel: #FBF8F5; --vc-tinta: #3A3236; --vc-suave: #6A5D61; --vc-linea: #E1D6D0;
+  --vc-miel: #E2A24F; --vc-salvia: #9DB09A; --vc-ciruela: #6E4B5F; --vc-sobre: #FFFFFF; --vc-foco: #B87822;
+}
+:root[data-theme='dark'] .vc {
+  --vc-fondo: #2A2427; --vc-papel: #332C30; --vc-tinta: #F0E6DD; --vc-suave: #B6A8AB; --vc-linea: #4A4045;
+  --vc-miel: #E8B063; --vc-salvia: #8AA286; --vc-ciruela: #D8B0C6; --vc-sobre: #2A2427; --vc-foco: #E8B063;
+}
+.vc { box-sizing: border-box; background: var(--vc-fondo); color: var(--vc-tinta); border-radius: 24px; padding: 20px 20px 48px; line-height: 1.6; position: relative; overflow: hidden; min-height: 70vh; display: flex; flex-direction: column; }
+.vc *, .vc *::before, .vc *::after { box-sizing: border-box; }
+.vc::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 60%; pointer-events: none; background: radial-gradient(40rem 16rem at 50% -3rem, color-mix(in srgb, var(--vc-miel) 26%, transparent), transparent 70%); }
+.vc-en-descanso::before { background: radial-gradient(40rem 16rem at 50% -3rem, color-mix(in srgb, var(--vc-salvia) 28%, transparent), transparent 70%); }
+.vc-barra { width: 100%; max-width: 34rem; margin-inline: auto; flex: none; }
+.vc-barra .vt { margin: 0; }
+.vc-cuerpo { width: 100%; max-width: 34rem; margin-inline: auto; margin-block: auto; padding-block: 24px; min-width: 0; }
+.vc > * { position: relative; }
+.vc h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; letter-spacing: -0.01em; margin: 6px 0 0; font-size: clamp(1.5rem, 5.5vw, 2.1rem); line-height: 1.25; overflow-wrap: anywhere; }
+.vc h1.vc-tema { font-size: clamp(1.9rem, 8vw, 3rem); line-height: 1.15; }
+.vc p { margin: 0; }
+.vc-suave { color: var(--vc-suave); }
+.vc h1 + .vc-suave { margin-top: 14px; }
+.vc-tiempo { margin-top: 18px !important; font-size: 1.25rem; }
+.vc-en-descanso h1 { color: color-mix(in srgb, var(--vc-salvia) 70%, var(--vc-tinta)); }
+.vc-resumen { margin-top: 40px; }
+.vc-resumen p { margin-top: 16px; }
+.vc-acciones { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 40px; }
+.vc-principal, .vc-secundario { min-height: 48px; border-radius: 999px; padding: 12px 32px; font: inherit; font-size: 1.05rem; font-weight: 600; cursor: pointer; border: 1.5px solid var(--vc-ciruela); }
+.vc-principal { background: var(--vc-ciruela); color: var(--vc-sobre); }
+.vc-secundario { background: transparent; color: var(--vc-ciruela); }
+.vc-principal:hover, .vc-secundario:hover { filter: brightness(1.06); }
+.vc-texto { background: none; border: 0; padding: 8px 0; min-height: 44px; font: inherit; color: var(--vc-ciruela); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.vc :focus-visible { outline: 3px solid var(--vc-foco); outline-offset: 3px; border-radius: 6px; }
+.vc-modulos { margin-top: 32px; }
+.vc-terminar { margin-top: 32px; color: var(--vc-suave); }
+.vc-hora { margin-top: 16px; font-size: 0.88rem; }
+.vc-linea { display: flex; gap: 6px; align-items: center; min-height: 14px; }
+.vc-tramo { position: relative; min-width: 6px; overflow: hidden; }
+.vc-block { height: 10px; border-radius: 5px; background: var(--vc-linea); }
+.vc-break { height: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg, var(--vc-linea) 0 3px, transparent 3px 8px); }
+.vc-relleno { position: absolute; inset: 0; transform-origin: left center; background: var(--vc-miel); transition: transform 1s linear; }
+.vc-break .vc-relleno { background: var(--vc-salvia); }
+@media (prefers-reduced-motion: reduce) { .vc-relleno { transition: none; } }
+@media (max-width: 420px) { .vc-principal, .vc-secundario { padding: 12px 26px; } .vc { padding-left: 16px; padding-right: 16px; border-radius: 16px; } }

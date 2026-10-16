@@ -227,6 +227,7 @@ export function DailyGoalSettingDialog({ currentGoalMinutes, onSaveGoal, onDismi
                 max={480}
                 steps={29}
                 testId="goal_slider"
+                label="Ajuste preciso de la meta diaria, en minutos"
               />
             </div>
 

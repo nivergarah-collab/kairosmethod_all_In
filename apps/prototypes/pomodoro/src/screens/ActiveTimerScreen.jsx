@@ -20,15 +20,18 @@ function QuickPill({ testId, onClick, color, borderColor, icon, iconTint, label,
   );
 }
 
-export function ActiveTimerScreen() {
+export function ActiveTimerScreen({ visionName = null }) {
   const { state, vm } = useVM();
   const isEffectiveDark = useEffectiveDark();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const {
-    isSessionActive, isTimerRunning, currentPhase, secondsRemaining, phaseTotalSeconds, currentBlockIndex, activeBlocks,
-    configTopic: topic, configSubtopic: subtopic, soundAlertsEnabled, vibrationAlertsEnabled,
+    isSessionActive, isTimerRunning, isAwaitingSessionStart, currentPhase, secondsRemaining, phaseTotalSeconds, currentBlockIndex, activeBlocks,
+    activeConfig, configTopic, configSubtopic, soundAlertsEnabled, vibrationAlertsEnabled,
   } = state;
+  // Tema y subtema de la sesión (no los del formulario de Configurar, que pueden cambiar mientras tanto).
+  const topic = activeConfig ? activeConfig.topic : configTopic;
+  const subtopic = activeConfig ? (activeConfig.subtopicEmpty ? '' : activeConfig.subtopic) : configSubtopic;
 
   if (!isSessionActive) {
     // Idle screen when no session is running
@@ -66,6 +69,11 @@ export function ActiveTimerScreen() {
           <T v="bodyMedium" color="var(--on-surface-variant)" as="div" style={{ textAlign: 'center' }}>
             {subtopic.trim() === '' ? 'Sesión de Estudio' : subtopic}
           </T>
+          {visionName && (
+            <T v="labelSmall" color="var(--on-surface-variant)" as="div" style={{ textAlign: 'center', marginTop: 4 }} testId="vision_label">
+              {`Visión: ${visionName}`}
+            </T>
+          )}
 
           <div style={{ height: 10 }} />
 
@@ -131,7 +139,7 @@ export function ActiveTimerScreen() {
           color={currentPhase === TimerPhase.FOCUS ? 'var(--pomo-primary)' : 'var(--break-green)'}
           style={{ width: 72, padding: 0 }}
         >
-          <Icon name={isTimerRunning ? 'Pause' : 'PlayArrow'} size={36} label={isTimerRunning ? 'Pausar' : 'Reanudar'} />
+          <Icon name={isTimerRunning ? 'Pause' : 'PlayArrow'} size={36} label={isTimerRunning ? 'Pausar' : isAwaitingSessionStart ? 'Iniciar sesión' : 'Reanudar'} />
         </Button>
 
         {/* Skip phase button */}

@@ -98,3 +98,6 @@
 .m3-linear > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--primary); display: block; }
 
 .m3-divider { height: 1px; border: 0; margin: 0; background: var(--outline-variant); }
+
+/* Foco visible solo con teclado en los Surface clicables (role=button). */
+.m3-surface[role='button']:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }

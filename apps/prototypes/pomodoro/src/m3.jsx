@@ -23,11 +23,15 @@ export function Icon({ name, size = 24, tint, style, className, label }) {
 }
 
 /** Surface (color por defecto: surface). radius en dp; border: string CSS; onClick lo vuelve clicable. */
-export function Surface({ color, radius = 0, border, onClick, className, style, children, testId, tour, as: As = 'div' }) {
+export function Surface({ color, radius = 0, border, onClick, className, style, children, testId, tour, pressed, as: As = 'div' }) {
+  // Un Surface clicable es un botón para el teclado y los lectores de pantalla (como `clickable` en Compose).
+  const boton = onClick && As === 'div';
+  const teclas = boton ? (e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onClick(e); } } : undefined;
   return (
     <As
       className={cx('m3-surface', onClick && 'm3-state', className)}
       onClick={onClick}
+      {...(boton ? { role: 'button', tabIndex: 0, onKeyDown: teclas, 'aria-pressed': pressed } : null)}
       data-testid={testId}
       data-tour={tour}
       style={{ background: color, borderRadius: radius, border, overflow: radius ? 'hidden' : undefined, ...style }}
@@ -53,10 +57,10 @@ export function Card({ color, radius = 12, border, className, style, children, t
 }
 
 function buttonImpl(kind) {
-  return function Btn({ onClick, color, contentColor, radius, height, icon, iconSize = 18, children, className, style, testId, tour, disabled }) {
+  return function Btn({ onClick, color, contentColor, radius, height, icon, iconSize = 18, children, className, style, testId, tour, disabled, type = 'button' }) {
     return (
       <button
-        type="button"
+        type={type}
         className={cx('m3-btn', kind, icon && 'with-icon', className)}
         onClick={onClick}
         disabled={disabled}
@@ -113,7 +117,7 @@ export function OutlinedTextField({ value, onChange, label, placeholder, radius 
 }
 
 /** Slider con pasos: steps = marcas intermedias (igual que Compose), value/onChange en el rango [min,max]. */
-export function Slider({ value, onChange, min, max, steps = 0, testId, className }) {
+export function Slider({ value, onChange, min, max, steps = 0, testId, className, label }) {
   const n = steps + 1; // intervalos
   const step = (max - min) / n;
   const p = (value - min) / (max - min);
@@ -139,6 +143,7 @@ export function Slider({ value, onChange, min, max, steps = 0, testId, className
         step={step}
         value={value}
         data-testid={testId}
+        aria-label={label}
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </div>
@@ -146,12 +151,12 @@ export function Slider({ value, onChange, min, max, steps = 0, testId, className
 }
 
 /** Switch. colors: { checkedThumb, checkedTrack, uncheckedThumb, uncheckedTrack }; thumbIcon: nombre de ícono (16dp). */
-export function Switch({ checked, onChange, colors = {}, thumbIcon, testId }) {
+export function Switch({ checked, onChange, colors = {}, thumbIcon, testId, label }) {
   const thumb = checked ? colors.checkedThumb : colors.uncheckedThumb;
   const track = checked ? colors.checkedTrack : colors.uncheckedTrack;
   return (
     <span className={cx('m3-switch', checked && 'checked', thumbIcon && 'has-thumb-icon')}>
-      <input type="checkbox" role="switch" checked={checked} data-testid={testId} onChange={(e) => onChange(e.target.checked)} />
+      <input type="checkbox" role="switch" checked={checked} data-testid={testId} aria-label={label} onChange={(e) => onChange(e.target.checked)} />
       <span className="strack" style={{ background: track, borderColor: checked ? 'transparent' : colors.uncheckedBorder }} />
       <span className="sthumb" style={{ background: thumb, color: checked ? 'var(--on-primary-container)' : 'var(--surface-container-highest)' }}>
         {thumbIcon && <Icon name={thumbIcon} size={16} />}

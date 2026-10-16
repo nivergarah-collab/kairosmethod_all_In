@@ -1,0 +1,24 @@
+/* Piezas comunes de las visiones: heredan los colores de la visión (color: inherit, bordes con currentColor). */
+.vd { margin: 0; color: inherit; font: inherit; }
+.vd, .vd *, .vd *::before, .vd *::after { box-sizing: border-box; }
+.vd-titulo { margin: 0; font: inherit; }
+.vd-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 48px; padding: 8px 14px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; border: 1.5px solid color-mix(in srgb, currentColor 35%, transparent); border-radius: 12px; }
+.vd-cabecera[aria-expanded='true'] { background: color-mix(in srgb, currentColor 8%, transparent); border-color: color-mix(in srgb, currentColor 55%, transparent); }
+.vd-cabecera:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+.vd-texto { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.vd-nombre { font-weight: 600; }
+.vd-resumen { font-size: .85em; opacity: .85; font-weight: 400; }
+.vd-flecha { flex: none; transition: transform .2s ease; }
+.vd-flecha.vd-abierta { transform: rotate(180deg); }
+.vd-cuerpo { padding: 12px 2px 2px; min-width: 0; }
+.vl { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.vl-item { border: 1.5px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: 12px; }
+.vl-item.vl-actual { border-color: currentColor; background: color-mix(in srgb, currentColor 8%, transparent); }
+.vl-etiqueta { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; min-height: 48px; cursor: pointer; }
+.vl-etiqueta:has(input:focus-visible) { outline: 3px solid currentColor; outline-offset: 2px; border-radius: 12px; }
+.vl input[type='checkbox'] { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: currentColor; }
+.vl-texto { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.vl-meta { font-size: .8em; opacity: .85; }
+.vl-goal { font-weight: 500; }
+.vl-hecho .vl-goal { text-decoration: line-through; text-decoration-thickness: 1px; opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .vd-flecha { transition: none; } }

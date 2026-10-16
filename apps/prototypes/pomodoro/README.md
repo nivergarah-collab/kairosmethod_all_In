@@ -1,49 +1,108 @@
-# PomoStudy · paridad con el APK (v0.2.0)
+# PomoStudy · Pomodoro (v0.3.0)
 
-Copia fiel, en React + Vite, de la app Android PomoStudy (Kotlin + Jetpack Compose). Se portó archivo por archivo, sin cambios estéticos: mismas pantallas, textos, colores (`Color.kt`, `Theme.kt`), tipografía de Material 3 (material3 1.3.0), medidas en dp = px y la misma lógica del `MainViewModel`.
-
-## Qué hay
-
-| Android | Web |
-|---|---|
-| `ui/theme/*` | `src/theme.css` (colores y escala tipográfica), `src/m3.css`, `src/m3.jsx` (componentes Material 3 usados) |
-| `MainViewModel` + `StudyRepository` + Room | `src/store.js` (mismas acciones y reglas; base en `localStorage`, clave `pomostudy_database.v1`) |
-| `NotificationAlertManager` | `src/alerts.js` |
-| `MainActivity` (Scaffold + NavigationBar) | `src/App.jsx`, `src/app.css` |
-| `ui/session/*` | `src/screens/SessionConfigScreen.jsx`, `ActiveTimerScreen.jsx`, `SessionSummaryDialog.jsx` |
-| `ui/stats/StatsScreen` | `src/screens/StatsScreen.jsx` |
-| `ui/user/UserManagementDialog` | `src/screens/UserManagementDialog.jsx` |
-| `ui/components/*` | `src/components/CommonComponents.jsx`, `DailyGoalComponents.jsx`, `WeeklyStudyChart.jsx` |
-| (solo web) tutorial guiado | `src/tutorial/` (ver «Tutorial») |
+Temporizador Pomodoro en React + Vite. Parte de un port fiel de la app Android PomoStudy (Kotlin + Jetpack Compose) y le suma **cinco visiones** intercambiables, que comparten un mismo contrato de sesión, paletas de color, descansos configurables y un tutorial guiado. Es un solo proyecto responsive: celular, tablet y PC.
 
 ## Comandos
 
 ```bash
 npm ci
 npm run dev     # desarrollo
-npm test        # lógica del temporizador, del repositorio y del tutorial (node:test)
+npm test        # lógica del contrato, del repositorio, de las visiones y del tutorial (node:test)
 npm run build -- --base=/<ruta>/pomodoro/
 ```
 
-## Cambios que impone la plataforma (los únicos)
+## Qué hay
 
-- **Base de datos:** Room → `localStorage` (mismas tablas: perfiles, sesiones y bloques). Igual que en el APK, el estado de la configuración, la sesión en curso y las preferencias (sonido, vibración, tema) vive en memoria y se reinicia al recargar.
-- **Sonido:** el APK reproduce el tono de notificación del sistema y `ToneGenerator`; la web no tiene ese sonido, así que `alerts.js` sintetiza tonos de la misma duración y secuencia (aproximados).
-- **Vibración:** mismos patrones, con `navigator.vibrate` (solo funciona en Android/Chrome; sin amplitudes).
-- **Pantalla:** diseño responsive por ancho, en un solo proyecto (sin código de interfaz duplicado). En celular (menos de 640 px) se ve igual que el APK: una columna de hasta 480 px centrada con barra inferior. En tablet (640–899 px) la columna crece hasta 760 px y las pantallas pasan a 2 columnas. En PC (desde 900 px) la barra inferior se vuelve un riel lateral (compacto hasta 1099 px, con etiquetas desde 1100 px) y el contenido ocupa hasta 1120 px en 2 columnas. Colores, tipografía y reglas no cambian. Sin barra de estado ni botón Atrás del sistema.
-- **Tipografía:** Roboto (variable) incluida con `@fontsource-variable/roboto`; el APK usa la fuente por defecto del sistema (Roboto en Android).
+| Pieza | Dónde |
+|---|---|
+| Tema Material 3 (colores, escala tipográfica, componentes) | `src/theme.css`, `src/m3.css`, `src/m3.jsx` |
+| Base local y reglas de perfiles, sesiones y bloques | `src/store.js` (en `localStorage`, clave `pomostudy_database.v1`) |
+| Contrato de sesión común | `src/session/` |
+| Alertas de sonido y vibración | `src/alerts.js` |
+| App y pantallas (Configurar, temporizador, Estadísticas, perfil) | `src/App.jsx`, `src/screens/` |
+| Componentes comunes y secciones plegables | `src/components/` |
+| Visiones (capas de presentación) y su selector | `src/visions/`, `src/screens/VisionPickerDialog.jsx` |
+| Paletas de la página principal | `src/palettes.js`, `src/components/PaletteCard.jsx` |
+| Tutorial guiado | `src/tutorial/` |
+
+## Contrato de sesión común
+
+Vive en `src/session/contract.js`: módulo puro, sin DOM, sin reloj ni almacenamiento propios (el instante se recibe como argumento). `src/store.js` lo usa para toda la lógica de la sesión y solo añade base de datos, alertas y reloj.
+
+| Pieza | Qué es |
+|---|---|
+| `createSession(config, ahora)` | Sesión nueva (bloque 1, enfoque, corriendo) con bloques y metas |
+| `reduceSession(sesion, accion, ahora)` | Aplica una acción y devuelve `{ session, events }` sin mutar la entrada |
+| Acciones (`ActionType`) | `tick`, `togglePlay`, `pause`, `resume`, `addMinutes`, `toggleBlock`, `completeCurrent`, `skipPhase`, `restartPhase`, `finish` |
+| Eventos (`EventKind`) | `alert` (clave de alerta del APK) y `haptic`; cada visión decide cómo mostrarlos |
+| `extractSession(sesion)` | Resultado: tema, bloques, segundos de enfoque y descanso, tasa de cumplimiento |
+| `toSavedRecord(sesion, ...)` | Registro guardable `{ session, blocks }`. **No incluye la visión usada** |
+| `fromSavedRecord(registro, bloques)` | Sesión terminada, de solo lectura, para reabrirla con cualquier visión |
+
+## Visiones
+
+Al pulsar «Iniciar» (pestaña Configurar) se abre un selector accesible (`role="dialog"`, foco atrapado, Escape cierra, flechas mueven entre opciones). La visión elegida vive solo en memoria y no se guarda con la sesión, así que cualquier sesión se puede reabrir con cualquiera.
+
+| Visión | Idea |
+|---|---|
+| Pomodoro | Reloj con arco, atajos de teclado y modo enfoque |
+| Calma | Planear la tarde: módulos, descansos y hora de término |
+| Visión | Mapa de ruta de fichas con la ficha actual abierta |
+| Paridad | La presentación base, copia fiel de la app Android |
+| Investigación | Perfiles de partida (Libre, Guiado, Estructurado) y ajustes de avisos y pantalla |
+
+Cada visión tiene un botón **Colores** con el tema (del dispositivo, claro u oscuro) y las paletas que sugiere; esas paletas solo afectan a su propia visión.
+
+## Paletas de la página principal
+
+En Configurar hay un selector de paleta que se combina con claro/oscuro: Original, Salvia y nogal, Océano y coral, y Ciruela y menta. Las pruebas exigen contraste 4,5:1 en texto y 3:1 en elementos gráficos para cada paleta y modo.
+
+## Descansos y plegables
+
+- `longBreakEvery` define cada cuántos bloques hay descanso largo (0 = nunca; por defecto 4). Un descanso de 0 min equivale a no tenerlo. Los registros guardados antes de este campo se leen con 4.
+- Arriba de los controles de tiempo se ven las horas de estudio y las totales, que cambian al mover cualquier control.
+- Sonido y vibración, y la paleta, son tarjetas plegables.
+
+## Reabrir una sesión guardada
+
+En Estadísticas, cada sesión del historial tiene **Ver con una visión**: abre el selector y muestra la sesión en **solo lectura** (sin reloj, sin diálogo de resumen y sin cambiar el registro). Si hay una sesión en curso, el botón queda desactivado.
+
+## Almacenamiento
+
+Todo se guarda en `localStorage` del navegador, con `try/catch`; si falla, la app funciona sin recordar nada.
+
+| Qué | Clave |
+|---|---|
+| Perfiles, sesiones y bloques | `pomostudy_database.v1` |
+| Tutorial visto | `kairos_pomodoro_tutorial_v1` |
+| Paleta de la página principal | `kairos_pomodoro_palette_v1` |
+| Paleta de cada visión | `kairos_pomodoro_vision_<visión>_palette_v1` |
+| Ajustes de Investigación | `kairos_pomodoro_vision_investigacion_v1` |
+
+El estado de la configuración, la sesión en curso y las preferencias (sonido, vibración, tema) vive en memoria y se reinicia al recargar, igual que en el APK.
+
+## Cambios que impone la plataforma
+
+- **Base de datos:** Room → `localStorage` (mismas tablas: perfiles, sesiones y bloques).
+- **Sonido:** `alerts.js` sintetiza tonos de la misma duración y secuencia que el APK (aproximados).
+- **Vibración:** mismos patrones con `navigator.vibrate` (solo Android/Chrome; sin amplitudes).
+- **Pantalla:** responsive por ancho. En celular (menos de 640 px) una columna de hasta 480 px con barra inferior; en tablet (640–899 px) la columna crece hasta 760 px y pasa a 2 columnas; en PC (desde 900 px) la barra inferior es un riel lateral y el contenido ocupa hasta 1120 px en 2 columnas.
+- **Tipografía:** Roboto (variable) con `@fontsource-variable/roboto`.
 
 ## Tutorial
 
-La primera vez que se entra, un recorrido guiado de 18 pasos oscurece la pantalla y resalta cada parte: perfil y meta, plantillas, tema, bloques y descansos, alertas, objetivo por bloque, iniciar sesión, temporizador y sus controles, progreso de bloques, estadísticas e historial. Cambia de pestaña por ti; para mostrar el temporizador usa una sesión de muestra, solo en memoria, que descarta al terminar (no se guarda nada). Siempre tiene «Saltar tutorial», se cierra con Escape y se repite con el botón «?» (Ayuda) de la barra de navegación.
+La primera vez, un recorrido guiado de 18 pasos oscurece la pantalla y resalta cada parte. Cambia de pestaña por ti y usa una sesión de muestra, solo en memoria, que descarta al terminar. Siempre tiene «Saltar tutorial», se cierra con Escape y se repite con el botón «?» (Ayuda). Los elementos resaltados se marcan con `data-tour="..."`.
 
-- Recuerda en `localStorage` (clave `kairos_pomodoro_tutorial_v1`, con `try/catch`) si se vio o se saltó; si el almacenamiento falla, la app funciona y el tutorial se abre en cada carga.
-- Los elementos resaltados se marcan con `data-tour="..."`. La lógica pura (pasos, avance, persistencia, posición de la tarjeta y plan de vistas) está en `src/tutorial/*.js` con sus pruebas.
+## Accesibilidad
 
-## Rarezas del APK copiadas tal cual
+Auditoría con navegador real en 11 tamaños de pantalla (de 320×568 a 2560×1300), en claro y oscuro: sin scroll horizontal, sin elementos fuera de pantalla y sin controles menores de 24×24 px; `axe-core` (WCAG 2.2 AA) sin hallazgos de etiquetas, regiones, foco ni teclado.
 
-Se mantienen aunque parezcan errores, para que la paridad sea exacta: la meta por defecto es 100 min en el resumen semanal y 120 en el diálogo de meta; las etiquetas de semana salen como `-1s`, `-2s`; `Meta: 1.6666666h/día` usa `Float.toString`; la pantalla de estadísticas no muestra los bloques de cada sesión; el descanso largo ocurre cuando el índice del bloque es múltiplo de 4 y no es el último.
+**Límite conocido (paleta «Original»):** la app base hereda colores fijos del APK (rojo `#D9483B`, verde `#10B981`, azul `#0284C7`) que dan entre 2,1:1 y 4,4:1 en algunos textos pequeños. No se cambiaron para conservar la fidelidad con el APK; las demás paletas mejoran la mayoría de esos casos.
+
+## Rarezas del APK conservadas
+
+La meta por defecto es 100 min en el resumen semanal y 120 en el diálogo de meta; las etiquetas de semana salen como `-1s`, `-2s`; `Meta: 1.6666666h/día` usa `Float.toString`; la pantalla de estadísticas no muestra los bloques de cada sesión.
 
 ## Qué falta comprobar
 
-No hay capturas del APK en ejecución en el repositorio: la fidelidad visual se revisó contra el código Kotlin, no contra pantallas reales. Conviene comparar lado a lado con un emulador o dispositivo.
+La fidelidad visual de Paridad se revisó contra el código Kotlin y contra la web de referencia, no contra pantallas reales del APK. Conviene compararla lado a lado con un emulador o dispositivo.

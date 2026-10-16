@@ -1,22 +1,30 @@
 // Port de MainActivity.kt (PomoStudyApp): Scaffold con NavigationBar de 3 pestañas + diálogos.
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './app.css';
 import { Icon } from './m3.jsx';
 import { createStore, createDatabase } from './store.js';
 import { createAlertManager } from './alerts.js';
 import { safeLocalStorage } from './storage.js';
+import { aplicarPaleta, cargarPaleta, guardarPaleta } from './palettes.js';
 import { StoreProvider, useVM, useEffectiveDark } from './useStore.jsx';
 import { SessionConfigScreen } from './screens/SessionConfigScreen.jsx';
-import { ActiveTimerScreen } from './screens/ActiveTimerScreen.jsx';
+import { VisionHost } from './visions/VisionHost.jsx';
 import { StatsScreen } from './screens/StatsScreen.jsx';
 import { SessionSummaryDialog } from './screens/SessionSummaryDialog.jsx';
 import { UserManagementDialog } from './screens/UserManagementDialog.jsx';
+import { VisionPickerDialog } from './screens/VisionPickerDialog.jsx';
+import { DEFAULT_VISION } from './visions/registry.js';
 import Tutorial from './tutorial/Tutorial.jsx';
 import { getStorage, shouldAutoOpen } from './tutorial/persist.js';
 
 function PomoStudyApp() {
   const { state, vm } = useVM();
   const [showUserDialog, setShowUserDialog] = useState(false);
+  // Visión elegida para la sesión en curso. Es solo presentación: no se guarda con la sesión.
+  const [showPicker, setShowPicker] = useState(false);
+  const [vision, setVision] = useState(DEFAULT_VISION);
+  // Si hay un id, el selector abre esa sesión guardada para repasarla (solo lectura) en lugar de iniciar una nueva.
+  const [reviewId, setReviewId] = useState(null);
   // El tutorial se abre solo la primera vez y se repite con el botón «?» (Ayuda)
   const [showTutorial, setShowTutorial] = useState(() => shouldAutoOpen(getStorage()));
   const isDark = useEffectiveDark();
@@ -24,6 +32,16 @@ function PomoStudyApp() {
   useEffect(() => {
     document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
   }, [isDark]);
+
+  // Paleta de la página principal: se pone sobre los roles de theme.css y se recuerda en este dispositivo.
+  useEffect(() => {
+    aplicarPaleta(document.documentElement, state.palette, isDark);
+  }, [state.palette, isDark]);
+  const paletaInicial = useRef(true);
+  useEffect(() => {
+    if (paletaInicial.current) { paletaInicial.current = false; return; }
+    guardarPaleta(safeLocalStorage(), state.palette);
+  }, [state.palette]);
 
   // BackHandler(enabled = currentTab != 0) { setTab(0) }: en web, la tecla Escape no aplica; se deja el botón Atrás del navegador sin tocar.
 
@@ -34,13 +52,13 @@ function PomoStudyApp() {
   ];
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-vision={state.isSessionActive ? vision : undefined}>
       <div className="app-col">
         <div className="app-content">
-          <div className="app-screen" key={state.currentTab}>
-            {state.currentTab === 0 && <SessionConfigScreen onOpenUserDialog={() => setShowUserDialog(true)} />}
-            {state.currentTab === 1 && <ActiveTimerScreen />}
-            {state.currentTab === 2 && <StatsScreen onOpenUserDialog={() => setShowUserDialog(true)} />}
+          <div className={`app-screen${state.currentTab === 0 ? ' app-screen-config' : ''}`} key={state.currentTab}>
+            {state.currentTab === 0 && <SessionConfigScreen onOpenUserDialog={() => setShowUserDialog(true)} onStart={() => setShowPicker(true)} />}
+            {state.currentTab === 1 && <VisionHost vision={vision} />}
+            {state.currentTab === 2 && <StatsScreen onOpenUserDialog={() => setShowUserDialog(true)} onReviewSession={(id) => { setReviewId(id); setShowPicker(true); }} onReplicateSession={(id, mode) => vm.replicateSavedSession(id, mode)} />}
           </div>
         </div>
         <nav className="nav-bar" data-testid="main_bottom_nav">
@@ -74,6 +92,22 @@ function PomoStudyApp() {
           onDismiss={() => setShowUserDialog(false)}
         />
       )}
+      {showPicker && (
+        <VisionPickerDialog
+          initialVision={vision}
+          mode={reviewId != null ? 'review' : 'start'}
+          onDismiss={() => { setShowPicker(false); setReviewId(null); }}
+          onChoose={(id) => {
+            setVision(id);
+            setShowPicker(false);
+            if (reviewId != null) {
+              const abierta = vm.openSavedSession(reviewId);
+              setReviewId(null);
+              if (!abierta) vm.setTab(2);
+            } else vm.startSession();
+          }}
+        />
+      )}
       {showTutorial && <Tutorial onClose={() => setShowTutorial(false)} />}
       {state.showSummaryDialog && state.lastSummary && (
         <SessionSummaryDialog
@@ -87,7 +121,11 @@ function PomoStudyApp() {
 }
 
 export default function App() {
-  const store = useMemo(() => createStore({ db: createDatabase(safeLocalStorage()), alerts: createAlertManager() }), []);
+  const store = useMemo(() => {
+    const st = createStore({ db: createDatabase(safeLocalStorage()), alerts: createAlertManager() });
+    st.setPalette(cargarPaleta(safeLocalStorage()));
+    return st;
+  }, []);
   return (
     <StoreProvider store={store}>
       <PomoStudyApp />

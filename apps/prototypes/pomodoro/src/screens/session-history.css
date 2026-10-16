@@ -1,0 +1,12 @@
+/* Botón «Ver con una visión» del historial (reabre una sesión guardada, solo lectura, por el selector de visión). */
+.sh-ver { font: inherit; font-size: 0.85rem; font-weight: 600; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--primary); background: transparent; color: var(--on-surface); cursor: pointer; }
+.sh-ver:hover:not(:disabled) { background: var(--primary-container); color: var(--on-primary-container); }
+.sh-ver:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.sh-ver:disabled { cursor: not-allowed; border-style: dashed; border-color: var(--outline); color: var(--on-surface-variant); }
+.sh-replicate { font: inherit; font-size: 0.85rem; font-weight: 600; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--outline); background: transparent; color: var(--on-surface); cursor: pointer; }
+.sh-replicate:hover:not(:disabled) { background: var(--surface-variant); }
+.sh-replicate:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.sh-replicate:disabled { cursor: not-allowed; border-style: dashed; color: var(--on-surface-variant); }
+.sh-ver-aviso { flex-basis: 100%; font-size: 0.8rem; color: var(--on-surface-variant); }
+.sh-replicate-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
+.sh-replicate-actions .m3-btn { width: 100%; min-height: 44px; }

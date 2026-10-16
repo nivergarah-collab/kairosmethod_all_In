@@ -1,0 +1,65 @@
+/* Visión «Visión»: colores propios acotados a .vv (no se comparten con la página principal).
+   Día: «Salvia y terracota». Noche: «Nogal y ámbar». Sigue al tema de la app (data-theme). */
+.vv {
+  --vv-serif: Georgia, 'Times New Roman', serif; --vv-sans: 'Roboto Variable', Roboto, system-ui, sans-serif;
+  --vv-bg: #f1ebdd; --vv-ink: #2f2a22; --vv-ink2: #5f5442; --vv-accent: #b3481f; --vv-on-accent: #ffffff; --vv-sage: #4f6d4c;
+  --vv-surface: #fffdf7; --vv-high: #ebe3d1; --vv-line: #d6ccb6; --vv-done: #dde7d6; --vv-done-ink: #3c5238; --vv-pending: #f1ebdd;
+  --vv-btn: #3a2a1e; --vv-btn-ink: #ffffff; --vv-big: #2f2a22; --vv-shadow: rgba(91, 59, 36, 0.33); --vv-open-bg: #fffdf7; --vv-open-ink: #2f2a22;
+  --vv-open-ring: #4f6d4c; --vv-error: #a3231b;
+}
+:root[data-theme='dark'] .vv {
+  --vv-bg: #2a211b; --vv-ink: #f6ead4; --vv-ink2: #cdbda1; --vv-accent: #e6a23c; --vv-on-accent: #2a1a0a; --vv-sage: #9bbb8e;
+  --vv-surface: #35291f; --vv-high: #3f3329; --vv-line: #574838; --vv-done: #4d5b46; --vv-done-ink: #e3ecd9; --vv-pending: #2a211b;
+  --vv-btn: #e6a23c; --vv-btn-ink: #2a1a0a; --vv-big: #f6ead4; --vv-shadow: rgba(0, 0, 0, 0.55); --vv-open-bg: #f6ecd9; --vv-open-ink: #2a211b;
+  --vv-open-ring: #e6a23c; --vv-error: #ff9a8f;
+}
+.vv, .vv *, .vv *::before, .vv *::after { box-sizing: border-box; }
+.vv { background: var(--vv-bg); color: var(--vv-ink); border-radius: 24px; font-family: var(--vv-serif); }
+.vv-wrap { padding: 22px 20px 40px; display: flex; flex-direction: column; align-items: stretch; gap: 22px; min-height: 70vh; }
+.vv-wrap > * { width: 100%; max-width: 760px; margin-left: auto; margin-right: auto; }
+.vv-tag { font: 700 12px/16px var(--vv-sans); letter-spacing: 0.24em; text-transform: uppercase; color: var(--vv-accent); }
+.vv-head { display: flex; align-items: center; justify-content: center; gap: 44px; flex-wrap: wrap; }
+.vv-time { font-size: clamp(64px, 14vw, 100px); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--vv-big); }
+.vv-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.vv-btn { font: 600 12px/16px var(--vv-sans); letter-spacing: 0.12em; text-transform: uppercase; padding: 13px 20px; min-height: 44px; border: 0; border-radius: 30px; cursor: pointer; background: var(--vv-high); color: var(--vv-ink); box-shadow: inset 0 -3px 0 var(--vv-line); }
+.vv-btn:hover { filter: brightness(1.04); }
+.vv-btn.main { background: var(--vv-btn); color: var(--vv-btn-ink); padding: 13px 32px; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.35); }
+.vv-btn.small { padding: 9px 14px; }
+.vv :focus-visible { outline: 3px solid var(--vv-accent); outline-offset: 2px; }
+.vv-open { background: var(--vv-open-bg); color: var(--vv-open-ink); border-radius: 14px; padding: 20px 26px 12px; min-height: 200px; box-shadow: 0 16px 26px var(--vv-shadow), 0 0 0 3px var(--vv-open-ring); display: flex; flex-direction: column; gap: 4px; }
+.vv-open h2 { margin: 0 0 8px; font: 400 clamp(21px, 4vw, 27px)/1.25 var(--vv-serif); overflow-wrap: anywhere; }
+.vv-grow { flex: 1; }
+.vv-foot { display: flex; justify-content: flex-end; padding-top: 6px; }
+.vv-open .vv-link { color: #5e4f3b; }
+.vv-strip, .vv-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.vv-strip { margin-top: -6px; }
+.vv-card { position: relative; flex: 1 1 140px; max-width: 200px; min-height: 84px; padding: 12px 14px; border: 0; border-radius: 10px; text-align: left; font: 400 14px/1.25 var(--vv-serif); display: flex; flex-direction: column; justify-content: space-between; gap: 8px; background: var(--vv-pending); color: var(--vv-ink2); box-shadow: inset 0 0 0 1.5px var(--vv-line); }
+.vv-card .n { font: 700 11px/14px var(--vv-sans); letter-spacing: 0.16em; color: var(--vv-accent); }
+.vv-card .t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.vv-card .ok { position: absolute; right: 12px; top: 10px; font: 700 14px/1 system-ui, sans-serif; color: var(--vv-accent); }
+.vv-card.done { background: var(--vv-done); color: var(--vv-done-ink); box-shadow: none; }
+.vv-slot { background: color-mix(in srgb, var(--vv-open-ring) 8%, transparent); border: 3px dashed var(--vv-open-ring); box-shadow: none; align-items: center; justify-content: center; color: var(--vv-ink2); font: 700 11px/14px var(--vv-sans); letter-spacing: 0.14em; text-transform: uppercase; }
+.vv-slot::before { content: ''; position: absolute; left: 50%; top: -17px; transform: translateX(-50%); border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 13px solid var(--vv-open-ring); }
+.vv-grid .vv-card { flex: 1 1 calc(50% - 6px); max-width: none; min-height: 132px; padding: 14px 16px; font-size: 18px; cursor: pointer; }
+.vv-card.next { background: var(--vv-surface); color: var(--vv-ink); box-shadow: inset 0 0 0 2px var(--vv-accent); }
+.vv-card[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--vv-open-ring); }
+.vv-head-break { justify-content: space-between; }
+.vv-capsule { display: inline-flex; align-items: center; gap: 10px; padding: 8px 10px 8px 18px; border-radius: 40px; background: var(--vv-high); }
+.vv-capsule-time { font: 400 32px/1 var(--vv-serif); font-variant-numeric: tabular-nums; color: var(--vv-big); }
+.vv-foot-links { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; padding-top: 6px; }
+.vv-link { border: 0; background: transparent; cursor: pointer; padding: 10px 6px; min-height: 44px; font: 600 12px/16px var(--vv-sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--vv-ink2); text-decoration: underline; text-underline-offset: 4px; }
+.vv-link.danger { color: var(--vv-error); }
+.vv-idle { text-align: center; align-items: center; justify-content: center; }
+.vv-idle h2 { margin: 0; font: 400 28px/1.2 var(--vv-serif); }
+.vv-idle p { margin: 0; max-width: 34ch; color: var(--vv-ink2); font: italic 18px/1.4 var(--vv-serif); }
+@media (max-width: 560px) {
+  .vv-wrap { padding: 18px 14px 36px; gap: 18px; border-radius: 16px; }
+  .vv-head { gap: 18px; flex-direction: column; }
+  .vv-head-break { flex-direction: column; align-items: center; }
+  .vv-open { padding: 18px 16px 12px; min-height: 200px; }
+  .vv-card { flex: 1 1 calc(50% - 6px); max-width: none; }
+  .vv-slot::before { top: -15px; }
+}
+@media (prefers-reduced-motion: no-preference) { .vv-btn, .vv-card { transition: transform 0.12s, filter 0.12s, box-shadow 0.12s; } }
+/* Contraste AA en fichas hechas: el índice y la marca usan la tinta de «hecho» (el acento daba 4.26 de día y 3.31 de noche). */
+.vv-card.done .n, .vv-card.done .ok { color: var(--vv-done-ink); }

@@ -1,0 +1,28 @@
+/* Panel «Colores» de cada visión. Hereda los colores de la visión donde se pone (color: inherit, bordes con currentColor). */
+.vt { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin: 0 0 8px; font: 500 .9rem/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: inherit; }
+.vt, .vt *, .vt *::before, .vt *::after { box-sizing: border-box; }
+.vt-boton { display: inline-flex; align-items: center; gap: 6px; font: inherit; color: inherit; min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, currentColor 55%, transparent); background: transparent; cursor: pointer; }
+.vt-boton[aria-expanded='true'] { background: color-mix(in srgb, currentColor 12%, transparent); }
+.vt-boton:focus-visible, .vt-opcion:has(input:focus-visible), .vt-paleta:has(input:focus-visible) { outline: 3px solid currentColor; outline-offset: 2px; }
+.vt-panel { width: min(100%, 34rem); display: grid; gap: 14px; padding: 14px; border: 1.5px solid color-mix(in srgb, currentColor 45%, transparent); border-radius: 14px; text-align: left; }
+.vt-grupo { min-width: 0; }
+.vt-titulo { margin: 0 0 6px; font-weight: 700; }
+.vt-ayuda { margin: 0 0 8px; opacity: .85; font-size: .85rem; font-weight: 400; }
+.vt-fila { display: flex; flex-wrap: wrap; gap: 8px; }
+.vt-opcion, .vt-paleta { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 12px; border: 1.5px solid color-mix(in srgb, currentColor 35%, transparent); border-radius: 12px; cursor: pointer; }
+.vt-opcion.vt-activa, .vt-paleta.vt-activa { border-color: currentColor; background: color-mix(in srgb, currentColor 12%, transparent); }
+.vt input[type='radio'] { width: 20px; height: 20px; margin: 0; accent-color: currentColor; flex: none; }
+.vt-lista { display: grid; gap: 8px; }
+.vt-paleta { align-items: center; }
+.vt-muestras { display: inline-flex; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 40%, transparent); }
+.vt-muestras span { width: 16px; height: 26px; }
+.vt-texto { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.vt-texto small { font-weight: 400; opacity: .85; font-size: .82rem; }
+@media (prefers-reduced-motion: reduce) { .vt * { transition: none !important; } }
+@media (min-width: 700px) {
+  .vt-panel { width: min(100%, 46rem); grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); align-items: start; }
+}
+
+.vt-flecha { flex: none; transition: transform .2s ease; }
+.vt-flecha.vt-abierta { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .vt-flecha { transition: none; } }
