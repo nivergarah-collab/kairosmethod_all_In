@@ -1,0 +1,5 @@
+/* Aviso de revisión de una sesión guardada (solo lectura). Usa los colores de la app, no los de la visión. */
+.rv-aviso { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 12px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--primary); background: var(--primary-container); color: var(--on-primary-container); font: 400 0.9rem/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+.rv-aviso p { margin: 0; min-width: 0; flex: 1 1 14rem; }
+.rv-cerrar { font: inherit; font-weight: 600; min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 1.5px solid currentColor; background: transparent; color: inherit; cursor: pointer; }
+.rv-cerrar:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }

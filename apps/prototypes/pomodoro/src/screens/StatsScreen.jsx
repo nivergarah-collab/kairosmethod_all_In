@@ -1,17 +1,19 @@
 // Port de ui/stats/StatsScreen.kt
 import React, { useState } from 'react';
-import { Icon, IconButton, Surface, Card, Button, TextButton, AlertDialog, T, alpha } from '../m3.jsx';
+import { Icon, IconButton, Surface, Card, Button, OutlinedButton, TextButton, AlertDialog, T, alpha } from '../m3.jsx';
 import { useVM } from '../useStore.jsx';
 import { StatCard, SimpleBarChart, UserSelectorBar } from '../components/CommonComponents.jsx';
 import { DailyGoalProgressCard, DailyGoalSettingDialog } from '../components/DailyGoalComponents.jsx';
+import './session-history.css';
 import { WeeklyStudyProductivityCard, format1, formatDayMonthTime } from '../components/WeeklyStudyChart.jsx';
 
-export function StatsScreen({ onOpenUserDialog }) {
+export function StatsScreen({ onOpenUserDialog, onReviewSession }) {
   const { state, vm } = useVM();
   const activeUser = state.activeUser;
   const sessions = state.userSessions;
 
   const [sessionToDelete, setSessionToDelete] = useState(null);
+  const [sessionToReplicate, setSessionToReplicate] = useState(null);
   const [showGoalEditor, setShowGoalEditor] = useState(false);
 
   const totalFocusSeconds = sessions.reduce((acc, s) => acc + s.totalFocusSecondsSpent, 0);
@@ -151,6 +153,10 @@ export function StatsScreen({ onOpenUserDialog }) {
             key={session.id}
             session={session}
             onDeleteClick={() => setSessionToDelete(session)}
+            onViewClick={onReviewSession ? () => onReviewSession(session.id) : undefined}
+            onReplicateClick={() => setSessionToReplicate(session)}
+            viewDisabled={state.isSessionActive && !state.isReviewing}
+            replicateDisabled={state.isSessionActive && !state.isReviewing}
             style={{ margin: '6px 0' }}
           />
         ))
@@ -188,11 +194,44 @@ export function StatsScreen({ onOpenUserDialog }) {
           dismissButton={<TextButton onClick={() => setSessionToDelete(null)}>Cancelar</TextButton>}
         />
       )}
+
+      {sessionToReplicate != null && (
+        <AlertDialog
+          onDismiss={() => setSessionToReplicate(null)}
+          title="Replicar sesión"
+          text="¿Cómo quieres usar los datos de esta sesión?"
+          confirmButton={(
+            <div className="sh-replicate-actions">
+              <OutlinedButton onClick={() => setSessionToReplicate(null)}>Cancelar</OutlinedButton>
+              <OutlinedButton
+                onClick={() => {
+                  onReplicateSession?.(sessionToReplicate.id, 'configure');
+                  setSessionToReplicate(null);
+                }}
+                testId={`session_replicate_template_${sessionToReplicate.id}`}
+              >
+                Usar como plantilla para configurar
+              </OutlinedButton>
+              <Button
+                onClick={() => {
+                  onReplicateSession?.(sessionToReplicate.id, 'direct');
+                  setSessionToReplicate(null);
+                }}
+                testId={`session_replicate_direct_${sessionToReplicate.id}`}
+              >
+                Desplegar directamente
+              </Button>
+              <T v="bodySmall" color="var(--on-surface-variant)">El temporizador quedará detenido hasta que pulses Iniciar.</T>
+            </div>
+          )}
+          dismissButton={null}
+        />
+      )}
     </div>
   );
 }
 
-function SessionHistoryCard({ session, onDeleteClick, style }) {
+function SessionHistoryCard({ session, onDeleteClick, onViewClick, onReplicateClick, viewDisabled, replicateDisabled, style }) {
   const formattedDate = formatDayMonthTime(new Date(session.endTime));
   const focusMinutes = Math.floor(session.totalFocusSecondsSpent / 60);
 
@@ -256,7 +295,35 @@ function SessionHistoryCard({ session, onDeleteClick, style }) {
 
         <div style={{ height: 6 }} />
 
-        <T v="labelSmall" size={10} color="var(--on-surface-variant)" as="div">{formattedDate}</T>
+        <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <T v="labelSmall" size={10} color="var(--on-surface-variant)" as="div">{formattedDate}</T>
+          {onViewClick && (
+            <>
+              <button
+                type="button"
+                className="sh-ver"
+                onClick={onViewClick}
+                disabled={viewDisabled}
+                aria-describedby={viewDisabled ? `sh-ver-aviso-${session.id}` : undefined}
+                data-testid={`session_view_${session.id}`}
+              >
+                Ver con una visión
+              </button>
+              {viewDisabled && <span id={`sh-ver-aviso-${session.id}`} className="sh-ver-aviso">Termina o cancela la sesión en curso para repasar esta.</span>}
+            </>
+          )}
+          <button
+            type="button"
+            className="sh-replicate"
+            onClick={onReplicateClick}
+            disabled={replicateDisabled}
+            aria-describedby={replicateDisabled ? `sh-replicate-aviso-${session.id}` : undefined}
+            data-testid={`session_replicate_${session.id}`}
+          >
+            Replicar sesión
+          </button>
+          {replicateDisabled && <span id={`sh-replicate-aviso-${session.id}`} className="sh-ver-aviso">Termina la sesión en curso antes de replicar otra.</span>}
+        </div>
       </div>
     </Card>
   );

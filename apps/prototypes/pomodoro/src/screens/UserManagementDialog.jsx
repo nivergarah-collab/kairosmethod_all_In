@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, Surface, Card, Button, OutlinedButton, IconButton, OutlinedTextField, Slider, Icon, T, alpha } from '../m3.jsx';
+import { limitProfileName, normalizeProfileName } from '../profileName.js';
 
 export const AvatarEmojiList = ['🎓', '🚀', '💡', '🧠', '📚', '⭐', '🔥', '🎯', '🏆', '☕'];
 export const ProfileColorList = ['#E04F36', '#E28743', '#F59E0B', '#10B981', '#0284C7', '#8B5CF6'];
@@ -118,7 +119,7 @@ export function UserManagementDialog({ users, activeUser, onSelectUser, onCreate
                 <OutlinedTextField
                   testId="new_user_name_input"
                   value={newUserName}
-                  onChange={setNewUserName}
+                  onChange={(name) => setNewUserName(limitProfileName(name))}
                   label="Nombre del estudiante o perfil"
                   placeholder="Ej. María, Juan, Posgrado..."
                   radius={14}
@@ -164,7 +165,7 @@ export function UserManagementDialog({ users, activeUser, onSelectUser, onCreate
                 {`Meta diaria de estudio: ${(dailyGoalMinutes / 60).toFixed(1)} horas (${dailyGoalMinutes} min)`}
               </T>
 
-              <Slider value={dailyGoalMinutes} onChange={(v) => setDailyGoalMinutes(Math.trunc(v))} min={30} max={300} steps={8} />
+              <Slider value={dailyGoalMinutes} onChange={(v) => setDailyGoalMinutes(Math.trunc(v))} min={30} max={300} steps={8} label="Meta diaria de estudio, en minutos" />
 
               <div style={{ height: 20, flex: 'none' }} />
 
@@ -181,7 +182,7 @@ export function UserManagementDialog({ users, activeUser, onSelectUser, onCreate
                   disabled={nameBlank}
                   onClick={() => {
                     if (!nameBlank) {
-                      onCreateUser(newUserName, selectedColor, dailyGoalMinutes, selectedEmoji);
+                      onCreateUser(normalizeProfileName(newUserName), selectedColor, dailyGoalMinutes, selectedEmoji);
                       onDismiss();
                     }
                   }}

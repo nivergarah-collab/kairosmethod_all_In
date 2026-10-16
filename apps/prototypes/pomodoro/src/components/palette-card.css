@@ -1,0 +1,12 @@
+.pal-campo { border: 0; margin: 0; padding: 0; min-width: 0; width: 100%; box-sizing: border-box; }
+.pal-titulo { margin: 0; }
+.pal-ayuda { margin: 4px 0 12px; }
+.pal-lista { display: grid; gap: 8px; }
+.pal-opcion { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 10px 12px; min-height: 56px; border: 2px solid var(--outline-variant); border-radius: 12px; cursor: pointer; }
+.pal-opcion.pal-activa { border-color: var(--primary); background: var(--primary-container); color: var(--on-primary-container); }
+.pal-opcion.pal-activa .t-bodySmall { color: var(--on-primary-container) !important; }
+.pal-opcion input { width: 20px; height: 20px; accent-color: var(--primary); margin: 0; }
+.pal-opcion:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
+.pal-muestras { display: inline-flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--outline); }
+.pal-muestras span { width: 18px; height: 28px; }
+.pal-texto { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }

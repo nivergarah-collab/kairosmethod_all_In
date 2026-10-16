@@ -1,0 +1,50 @@
+/* Selectores rápidos con barra visible debajo incluso cuando todas las opciones caben. */
+.sc-scroll-section { width: 100%; min-width: 0; }
+.sc-hscroll { display: flex; align-items: stretch; width: 100%; min-width: 0; gap: 10px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-inline: contain; }
+.sc-hscroll::-webkit-scrollbar { display: none; }
+.sc-hscroll > * { flex: none; white-space: nowrap; scroll-snap-align: start; }
+.sc-scrollbar { display: block; width: 100%; height: 10px; margin: 3px 0 0; padding: 0; appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; background: linear-gradient(to right, color-mix(in srgb, var(--surface) 86%, #808080) 0 var(--sc-progress), color-mix(in srgb, var(--surface) 93%, #808080) var(--sc-progress) 100%); cursor: ew-resize; touch-action: pan-x; }
+.sc-scrollbar:focus-visible { outline: 2px solid color-mix(in srgb, var(--surface) 66%, #808080); outline-offset: 2px; }
+.sc-scrollbar::-webkit-slider-thumb { width: 15px; height: 7px; appearance: none; -webkit-appearance: none; border: 1px solid color-mix(in srgb, var(--surface) 94%, #808080); border-radius: 999px; background: color-mix(in srgb, var(--surface) 76%, #808080); box-shadow: 0 1px 2px #0002; }
+.sc-scrollbar::-moz-range-thumb { width: 13px; height: 5px; border: 1px solid color-mix(in srgb, var(--surface) 94%, #808080); border-radius: 999px; background: color-mix(in srgb, var(--surface) 76%, #808080); box-shadow: 0 1px 2px #0002; }
+.sc-scrollbar:disabled { cursor: default; }
+.sc-choice-strip--presets .sc-preset-choice { min-width: 180px; scroll-snap-align: start; }
+.sc-choice-strip--topics { gap: 8px; }
+.sc-topic-shortcuts-heading { display: flex; align-items: center; justify-content: space-between; min-height: 32px; }
+.sc-topic-manage-button { width: 34px; height: 34px; margin: -2px 0; border: 1px solid var(--outline-variant); border-radius: 10px; color: var(--on-surface-variant); }
+.sc-topic-choice { text-align: center; }
+
+/* Se elimina solo el techo artificial de la pantalla Configurar; las demás pestañas no cambian. */
+@media (min-width: 900px) {
+  .app-screen-config > :not(.m3-scrim) { width: 100%; max-width: none; }
+}
+
+/* Tablet y móvil conservan el carrusel táctil. En pantallas amplias, las opciones se reparten y quedan a la vista. */
+@media (min-width: 1600px) {
+  .app-screen-config > .sc-root { width: calc(100% - 24px); }
+  .sc-choice-strip--presets { flex-wrap: wrap; overflow: visible; }
+  .sc-choice-strip--presets .sc-preset-choice { flex: 1 1 calc(25% - 10px); min-width: 170px; }
+  .sc-choice-strip--topics { flex-wrap: wrap; overflow: visible; }
+  .sc-choice-strip--topics .sc-topic-choice { flex: 1 1 auto; }
+}
+
+.sc-topics-dialog { display: flex; flex-direction: column; gap: 14px; width: min(560px, calc(100vw - 32px)); max-height: min(720px, calc(100dvh - 32px)); overflow: auto; padding: 22px; border: 1px solid var(--outline-variant); border-radius: 22px; background: var(--surface); color: var(--on-surface); box-shadow: 0 24px 80px #0005; }
+.sc-topics-dialog:focus { outline: none; }
+.sc-topics-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.sc-topics-header h2, .sc-topics-header p { margin: 0; }
+.sc-topics-header p { max-width: 42ch; margin-top: 4px; }
+.sc-topics-form label { display: block; margin-bottom: 6px; color: var(--on-surface-variant); font-size: 12px; font-weight: 600; }
+.sc-topics-add-row { display: flex; gap: 8px; }
+.sc-topics-add-row input { min-width: 0; flex: 1; height: 48px; padding: 0 12px; border: 1px solid var(--outline); border-radius: 12px; background: var(--surface); color: var(--on-surface); font: inherit; }
+.sc-topics-add-row input:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.sc-topics-message { min-height: 18px; margin: -8px 0 0; color: var(--on-surface-variant); font-size: 12px; }
+.sc-topics-list { display: grid; gap: 8px; overflow-y: auto; }
+.sc-topic-saved { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 4px 8px 4px 14px; border: 1px solid var(--outline-variant); border-radius: 12px; background: var(--surface-variant); }
+.sc-topic-saved span { min-width: 0; overflow-wrap: anywhere; }
+.sc-topics-empty { margin: 0; padding: 18px; border: 1px dashed var(--outline-variant); border-radius: 12px; color: var(--on-surface-variant); text-align: center; }
+.sc-topics-footer { display: flex; justify-content: flex-end; }
+
+@media (max-width: 480px) {
+  .sc-topics-dialog { gap: 10px; padding: 16px; }
+  .sc-topics-add-row { align-items: stretch; flex-direction: column; }
+}

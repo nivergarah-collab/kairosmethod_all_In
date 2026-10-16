@@ -1,5 +1,11 @@
 // Port de MainViewModel.kt + StudyRepository.kt: mismo estado, mismas acciones y mismas reglas.
 // Sin dependencias del navegador: la base de datos, las alertas y el reloj se inyectan (así se prueba en Node).
+// La lógica de la sesión (fases, bloques, resumen y registro guardable) vive en el contrato común
+// `session/contract.js`; este store solo la conecta con la base, las alertas y el reloj.
+import { ActionType, EventKind, createSession, extractSession, fromSavedRecord, reduceSession, toSavedRecord } from './session/contract.js';
+import { PALETA_INICIAL, esPaleta } from './palettes.js';
+import { addUserTopic, removeUserTopic } from './userTopics.js';
+import { normalizeProfileName } from './profileName.js';
 
 export const TimerPhase = {
   FOCUS: 'FOCUS',
@@ -24,20 +30,43 @@ export const AlertType = {
 
 // StudyPreset (MainViewModel.presets)
 export const presets = [
-  { name: 'Clásico Pomodoro', description: '25 min estudio / 5 min descanso', blocks: 4, workMinutes: 25, shortBreakMinutes: 5, longBreakMinutes: 15 },
-  { name: 'Deep Work Intensivo', description: '50 min estudio / 10 min descanso', blocks: 3, workMinutes: 50, shortBreakMinutes: 10, longBreakMinutes: 20 },
-  { name: 'Sprint Rápido', description: '15 min estudio / 3 min descanso', blocks: 4, workMinutes: 15, shortBreakMinutes: 3, longBreakMinutes: 10 },
-  { name: 'Maratón de Estudio', description: '45 min estudio / 15 min descanso', blocks: 6, workMinutes: 45, shortBreakMinutes: 15, longBreakMinutes: 25 },
+  { name: 'Clásico Pomodoro', description: '25 min estudio / 5 min descanso', blocks: 4, workMinutes: 25, shortBreakMinutes: 5, longBreakMinutes: 15, longBreakEvery: 4 },
+  { name: 'Deep Work Intensivo', description: '50 min estudio / 10 min descanso', blocks: 3, workMinutes: 50, shortBreakMinutes: 10, longBreakMinutes: 20, longBreakEvery: 4 },
+  { name: 'Sprint Rápido', description: '15 min estudio / 3 min descanso', blocks: 4, workMinutes: 15, shortBreakMinutes: 3, longBreakMinutes: 10, longBreakEvery: 4 },
+  { name: 'Maratón de Estudio', description: '45 min estudio / 15 min descanso', blocks: 6, workMinutes: 45, shortBreakMinutes: 15, longBreakMinutes: 25, longBreakEvery: 4 },
 ];
 
+const CONFIG_STATE_KEYS = Object.freeze({
+  topic: 'configTopic',
+  subtopic: 'configSubtopic',
+  blocksCount: 'configBlocksCount',
+  workMinutes: 'configWorkMinutes',
+  shortBreakMinutes: 'configShortBreakMinutes',
+  longBreakMinutes: 'configLongBreakMinutes',
+  longBreakEvery: 'configLongBreakEvery',
+  blockGoals: 'configBlockGoals',
+});
+
+/** Clave de la base local. Es la misma de siempre: quien ya usaba Pomodoro conserva su historial. */
+export const DATABASE_KEY = 'pomostudy_database.v1';
+
 /** Reemplazo de Room (AppDatabase "pomostudy_database"): tablas user_profiles, study_sessions, study_blocks. */
-export function createDatabase(storage = null, key = 'pomostudy_database.v1') {
+export function createDatabase(storage = null, key = DATABASE_KEY) {
   let data = { users: [], sessions: [], blocks: [], seq: { users: 0, sessions: 0, blocks: 0 } };
   try {
     const raw = storage?.getItem(key);
     if (raw) data = { ...data, ...JSON.parse(raw) };
   } catch {
     /* base ilegible: se empieza vacía, como fallbackToDestructiveMigration */
+  }
+  let namesMigrated = false;
+  if (Array.isArray(data.users)) {
+    data.users = data.users.map((user) => {
+      if (!user || typeof user !== 'object') return user;
+      const name = normalizeProfileName(user.name);
+      if (name !== user.name) namesMigrated = true;
+      return { ...user, name };
+    });
   }
   const save = () => {
     try {
@@ -46,17 +75,18 @@ export function createDatabase(storage = null, key = 'pomostudy_database.v1') {
       /* sin almacenamiento: queda en memoria */
     }
   };
+  if (namesMigrated) save();
   const next = (t) => ++data.seq[t];
   return {
     allUsers: () => [...data.users].sort((a, b) => a.id - b.id),
     insertUser(u) {
       const id = u.id ? u.id : next('users');
-      data.users = data.users.filter((x) => x.id !== id).concat({ ...u, id });
+      data.users = data.users.filter((x) => x.id !== id).concat({ ...u, name: normalizeProfileName(u.name), id });
       save();
       return id;
     },
     updateUser(u) {
-      data.users = data.users.map((x) => (x.id === u.id ? { ...u } : x));
+      data.users = data.users.map((x) => (x.id === u.id ? { ...u, name: normalizeProfileName(u.name) } : x));
       save();
     },
     deleteUser(u) {
@@ -87,9 +117,10 @@ export function createDatabase(storage = null, key = 'pomostudy_database.v1') {
 }
 
 export function createStore({ db = createDatabase(), alerts = { triggerAlert() {}, vibrateFeedback() {} }, now = () => Date.now(), schedule = setTimeout, cancel = clearTimeout } = {}) {
-  let accumulatedFocusSeconds = 0;
-  let accumulatedBreakSeconds = 0;
-  let sessionStartTime = 0;
+  let session = null; // sesión del contrato común (null si no hay una en curso)
+  let sessionSequence = 0;
+  let activeSessionId = null;
+  let awaitingSessionStart = false;
   let timerHandle = null;
   let timerToken = 0;
 
@@ -97,6 +128,7 @@ export function createStore({ db = createDatabase(), alerts = { triggerAlert() {
     soundAlertsEnabled: true,
     vibrationAlertsEnabled: true,
     isDarkTheme: null, // null = seguir al sistema
+    palette: PALETA_INICIAL, // paleta de la página principal (palettes.js)
     allUsers: [],
     activeUser: null,
     userSessions: [],
@@ -107,9 +139,13 @@ export function createStore({ db = createDatabase(), alerts = { triggerAlert() {
     configWorkMinutes: 25,
     configShortBreakMinutes: 5,
     configLongBreakMinutes: 15,
+    configLongBreakEvery: 4,
     configBlockGoals: {},
     // Sesión activa
     isSessionActive: false,
+    isReviewing: false, // true: se está viendo una sesión guardada (solo lectura)
+    isAwaitingSessionStart: false,
+    activeConfig: null, // configuración de la sesión en curso o en revisión (no la del formulario de Configurar)
     currentPhase: TimerPhase.FOCUS,
     currentBlockIndex: 1,
     secondsRemaining: 25 * 60,
@@ -152,6 +188,45 @@ export function createStore({ db = createDatabase(), alerts = { triggerAlert() {
     if (timerHandle != null) cancel(timerHandle);
     timerHandle = null;
   };
+
+  /** Proyecta la sesión del contrato sobre los campos planos que leen las pantallas. */
+  const project = (sess) => ({
+    currentPhase: sess.phase,
+    currentBlockIndex: sess.blockIndex,
+    secondsRemaining: sess.secondsRemaining,
+    phaseTotalSeconds: sess.phaseTotalSeconds,
+    isTimerRunning: sess.running,
+    activeBlocks: sess.blocks,
+    activeConfig: {
+      topic: sess.config.topic,
+      subtopic: sess.config.subtopic,
+      subtopicEmpty: !!sess.config.subtopicEmpty,
+      blocksCount: sess.config.blocksCount,
+      workMinutes: sess.config.workMinutes,
+      shortBreakMinutes: sess.config.shortBreakMinutes,
+      longBreakMinutes: sess.config.longBreakMinutes,
+      longBreakEvery: sess.config.longBreakEvery,
+    },
+  });
+
+  /** Envía una acción al contrato, aplica el resultado y dispara las alertas que pidió. */
+  function dispatch(action) {
+    if (!session) return;
+    const wasFinished = session.finished;
+    const result = reduceSession(session, action, now());
+    session = result.session;
+    set(project(session));
+    if (session.finished && !wasFinished) {
+      awaitingSessionStart = false;
+      stopTicker();
+      set({ isAwaitingSessionStart: false, lastSummary: extractSession(session), showSummaryDialog: true });
+    }
+    for (const ev of result.events) {
+      if (ev.kind === EventKind.ALERT) alertNow(AlertType[ev.type]);
+      else if (ev.kind === EventKind.HAPTIC && state.vibrationAlertsEnabled) alerts.vibrateFeedback();
+    }
+  }
+
   function startTimerTicker() {
     stopTicker();
     const token = timerToken;
@@ -161,80 +236,45 @@ export function createStore({ db = createDatabase(), alerts = { triggerAlert() {
       timerHandle = schedule(() => {
         timerHandle = null;
         if (token !== timerToken) return;
-        if (state.secondsRemaining > 0) {
-          set((s) => ({ secondsRemaining: s.secondsRemaining - 1 }));
-          if (state.currentPhase === TimerPhase.FOCUS) accumulatedFocusSeconds++;
-          else accumulatedBreakSeconds++;
-        } else {
-          onPhaseComplete();
-        }
+        dispatch({ type: ActionType.TICK });
         loop();
       }, 1000);
     };
     loop();
   }
 
-  function onPhaseComplete() {
-    const current = state.currentPhase;
-    const currentIndex = state.currentBlockIndex;
-    const totalBlocks = state.activeBlocks.length;
-
-    if (current === TimerPhase.FOCUS) {
-      // Marca el bloque como completado si aún no lo estaba
-      set((s) => ({
-        activeBlocks: s.activeBlocks.map((b) => (b.index === currentIndex && !b.isCompleted ? { ...b, isCompleted: true, completedAt: now() } : b)),
-      }));
-      if (currentIndex >= totalBlocks) {
-        alertNow(AlertType.SESSION_COMPLETE);
-        finishSessionPrompt();
-      } else {
-        alertNow(AlertType.BLOCK_ENDS);
-        const isLongBreak = currentIndex % 4 === 0;
-        const breakMinutes = isLongBreak ? state.configLongBreakMinutes : state.configShortBreakMinutes;
-        const breakSeconds = breakMinutes * 60;
-        set({ currentPhase: isLongBreak ? TimerPhase.LONG_BREAK : TimerPhase.SHORT_BREAK, secondsRemaining: breakSeconds, phaseTotalSeconds: breakSeconds });
-      }
-    } else {
-      const nextIndex = currentIndex + 1;
-      if (nextIndex <= totalBlocks) {
-        const workSeconds = state.configWorkMinutes * 60;
-        set({ currentBlockIndex: nextIndex, currentPhase: TimerPhase.FOCUS, secondsRemaining: workSeconds, phaseTotalSeconds: workSeconds });
-        alertNow(AlertType.BLOCK_BEGINS);
-      } else {
-        alertNow(AlertType.SESSION_COMPLETE);
-        finishSessionPrompt();
-      }
-    }
-  }
-
   function pauseTimer() {
     set({ isTimerRunning: false });
+    if (session) session = { ...session, running: false };
     stopTicker();
   }
   function resumeTimer() {
+    if (state.isReviewing) return; // una sesión guardada no se reanuda
+    if (awaitingSessionStart) {
+      awaitingSessionStart = false;
+      set({ isAwaitingSessionStart: false });
+      alertNow(AlertType.BLOCK_BEGINS);
+    }
     set({ isTimerRunning: true });
+    if (session) session = { ...session, running: true };
     startTimerTicker();
   }
 
+  /** Sale de la revisión de una sesión guardada y vuelve al historial. */
+  function closeReview() {
+    stopTicker();
+    session = null;
+    activeSessionId = null;
+    awaitingSessionStart = false;
+    set({ isSessionActive: false, isReviewing: false, isAwaitingSessionStart: false, isTimerRunning: false, showSummaryDialog: false, currentTab: 2 });
+  }
+
   function finishSessionPrompt() {
+    if (state.isReviewing) { closeReview(); return; }
     pauseTimer();
-    const totalPlanned = state.activeBlocks.length;
-    const completedCount = state.activeBlocks.filter((b) => b.isCompleted).length;
-    const completionRate = totalPlanned > 0 ? completedCount / totalPlanned : 1;
-    set({
-      lastSummary: {
-        topic: state.configTopic.trim() === '' ? 'Tema General' : state.configTopic,
-        subtopic: state.configSubtopic.trim() === '' ? 'Sesión de Estudio' : state.configSubtopic,
-        totalBlocksPlanned: totalPlanned,
-        blocksCompleted: completedCount,
-        focusSeconds: accumulatedFocusSeconds,
-        breakSeconds: accumulatedBreakSeconds,
-        completionRate,
-        satisfactionRating: 5,
-        notes: '',
-      },
-      showSummaryDialog: true,
-    });
+    awaitingSessionStart = false;
+    set({ isAwaitingSessionStart: false });
+    dispatch({ type: ActionType.FINISH });
   }
 
   // --- API pública (nombres del ViewModel) ----------------------------------------------------
@@ -252,50 +292,91 @@ export function createStore({ db = createDatabase(), alerts = { triggerAlert() {
     setSoundAlerts: (enabled) => set({ soundAlertsEnabled: enabled }),
     setVibrationAlerts: (enabled) => set({ vibrationAlertsEnabled: enabled }),
     setDarkTheme: (isDark) => set({ isDarkTheme: isDark }),
+    setPalette: (id) => set({ palette: esPaleta(id) ? id : PALETA_INICIAL }),
     toggleDarkTheme: (currentEffectiveDark) => set({ isDarkTheme: !currentEffectiveDark }),
     testAlert: (type) => alerts.triggerAlert(type, state.soundAlertsEnabled, state.vibrationAlertsEnabled),
 
     // Navegación
     setTab: (index) => set({ currentTab: index }),
 
-    // Configuración. setConfig({ topic, subtopic, blocksCount, workMinutes, shortBreakMinutes, longBreakMinutes })
+    // Configuración. setConfig({ topic, subtopic, blocksCount, workMinutes, shortBreakMinutes, longBreakMinutes, longBreakEvery })
     setConfig(partial) {
-      const map = { topic: 'configTopic', subtopic: 'configSubtopic', blocksCount: 'configBlocksCount', workMinutes: 'configWorkMinutes', shortBreakMinutes: 'configShortBreakMinutes', longBreakMinutes: 'configLongBreakMinutes' };
       const patch = {};
-      for (const [k, v] of Object.entries(partial)) patch[map[k]] = v;
+      for (const [k, v] of Object.entries(partial)) patch[CONFIG_STATE_KEYS[k]] = v;
       set(patch);
     },
+    addQuickTopic(topic) {
+      const current = state.activeUser;
+      if (!current) return false;
+      const quickTopics = addUserTopic(current.quickTopics, topic);
+      if (quickTopics.length === (current.quickTopics ?? []).length) return false;
+      const updated = { ...current, quickTopics };
+      db.updateUser(updated);
+      set({ activeUser: updated, allUsers: db.allUsers() });
+      return true;
+    },
+    removeQuickTopic(topic) {
+      const current = state.activeUser;
+      if (!current) return false;
+      const updated = { ...current, quickTopics: removeUserTopic(current.quickTopics, topic) };
+      if (updated.quickTopics.length === (current.quickTopics ?? []).length) return false;
+      db.updateUser(updated);
+      set({ activeUser: updated, allUsers: db.allUsers() });
+      return true;
+    },
     applyPreset(p) {
-      set({ configBlocksCount: p.blocks, configWorkMinutes: p.workMinutes, configShortBreakMinutes: p.shortBreakMinutes, configLongBreakMinutes: p.longBreakMinutes });
+      set({ configBlocksCount: p.blocks, configWorkMinutes: p.workMinutes, configShortBreakMinutes: p.shortBreakMinutes, configLongBreakMinutes: p.longBreakMinutes, configLongBreakEvery: p.longBreakEvery ?? 4 });
     },
     setBlockGoal: (blockIndex, goal) => set((s) => ({ configBlockGoals: { ...s.configBlockGoals, [blockIndex]: goal } })),
 
-    startSession() {
-      const totalBlocks = state.configBlocksCount;
-      const workMins = state.configWorkMinutes;
-      const topic = state.configTopic.trim() === '' ? 'Tema General' : state.configTopic;
-      const subtopic = state.configSubtopic.trim() === '' ? 'Sesión de Enfoque' : state.configSubtopic;
-      const blocks = Array.from({ length: totalBlocks }, (_, k) => {
-        const i = k + 1;
-        const customGoal = state.configBlockGoals[i] ?? '';
-        return { index: i, title: `Bloque ${i}`, goal: customGoal.trim() !== '' ? customGoal : `${topic}: ${subtopic}`, durationMinutes: workMins, isCompleted: false, completedAt: null };
-      });
-      const initialSeconds = workMins * 60;
-      accumulatedFocusSeconds = 0;
-      accumulatedBreakSeconds = 0;
-      sessionStartTime = now();
-      set({
-        activeBlocks: blocks,
-        currentBlockIndex: 1,
-        currentPhase: TimerPhase.FOCUS,
-        secondsRemaining: initialSeconds,
-        phaseTotalSeconds: initialSeconds,
-        isSessionActive: true,
-        isTimerRunning: true,
-        currentTab: 1,
-      });
-      alertNow(AlertType.BLOCK_BEGINS);
-      startTimerTicker();
+    startSession({ startPaused = false } = {}) {
+      activeSessionId = ++sessionSequence;
+      awaitingSessionStart = startPaused;
+      session = createSession(
+        {
+          topic: state.configTopic,
+          subtopic: state.configSubtopic,
+          blocksCount: state.configBlocksCount,
+          workMinutes: state.configWorkMinutes,
+          shortBreakMinutes: state.configShortBreakMinutes,
+          longBreakMinutes: state.configLongBreakMinutes,
+          longBreakEvery: state.configLongBreakEvery,
+          blockGoals: state.configBlockGoals,
+        },
+        now(),
+      );
+      if (startPaused) session = { ...session, running: false };
+      set({ ...project(session), isSessionActive: true, isReviewing: false, isAwaitingSessionStart: startPaused, currentTab: 1 });
+      if (!startPaused) {
+        alertNow(AlertType.BLOCK_BEGINS);
+        startTimerTicker();
+      }
+      return activeSessionId;
+    },
+    replicateSavedSession(sessionId, mode) {
+      if (!['configure', 'direct'].includes(mode) || (state.isSessionActive && !state.isReviewing)) return false;
+      const saved = state.userSessions.find((item) => item.id === sessionId);
+      if (!saved) return false;
+      const savedBlocks = db.blocksForSession(sessionId);
+      const config = {
+        topic: saved.topic,
+        subtopic: saved.subtopic,
+        blocksCount: saved.totalBlocksPlanned,
+        workMinutes: saved.workDurationMinutes,
+        shortBreakMinutes: saved.shortBreakMinutes,
+        longBreakMinutes: saved.longBreakMinutes,
+        longBreakEvery: saved.longBreakEvery,
+        blockGoals: Object.fromEntries(savedBlocks.filter((block) => block.goal !== `${saved.topic}: ${saved.subtopic}`).map((block) => [block.blockIndex, block.goal])),
+      };
+      const configPatch = Object.fromEntries(Object.entries(config).map(([key, value]) => [CONFIG_STATE_KEYS[key], value]));
+      stopTicker();
+      session = null;
+      activeSessionId = null;
+      awaitingSessionStart = false;
+      set({ isSessionActive: false, isReviewing: false, isAwaitingSessionStart: false, isTimerRunning: false, showSummaryDialog: false, ...configPatch });
+      if (mode === 'direct') api.startSession({ startPaused: true });
+      else set({ currentTab: 0 });
+      return true;
     },
 
     togglePlayPause() {
@@ -304,74 +385,70 @@ export function createStore({ db = createDatabase(), alerts = { triggerAlert() {
     },
     pauseTimer,
     resumeTimer,
-    addMinutes(minutes) {
-      const extra = minutes * 60;
-      set((s) => ({ secondsRemaining: s.secondsRemaining + extra, phaseTotalSeconds: s.phaseTotalSeconds + extra }));
-    },
-    toggleBlockCompletion(blockIndex) {
-      if (state.vibrationAlertsEnabled) alerts.vibrateFeedback();
-      set((s) => ({
-        activeBlocks: s.activeBlocks.map((b) => {
-          if (b.index !== blockIndex) return b;
-          const newState = !b.isCompleted;
-          return { ...b, isCompleted: newState, completedAt: newState ? now() : null };
-        }),
-      }));
-    },
-    markCurrentBlockCompleted() {
-      api.toggleBlockCompletion(state.currentBlockIndex);
-    },
-    skipCurrentPhase: () => onPhaseComplete(),
+    addMinutes: (minutes) => dispatch({ type: ActionType.ADD_MINUTES, minutes }),
+    toggleBlockCompletion: (blockIndex) => dispatch({ type: ActionType.TOGGLE_BLOCK, index: blockIndex }),
+    markCurrentBlockCompleted: () => dispatch({ type: ActionType.COMPLETE_CURRENT }),
+    skipCurrentPhase: () => dispatch({ type: ActionType.SKIP_PHASE }),
+    restartPhase: () => dispatch({ type: ActionType.RESTART_PHASE }),
     finishSessionPrompt,
 
     saveCompletedSession(notes, rating) {
       const user = state.activeUser;
-      const summary = state.lastSummary;
-      if (!user || !summary) return;
-      const session = {
-        userId: user.id,
-        topic: summary.topic,
-        subtopic: summary.subtopic,
-        totalBlocksPlanned: summary.totalBlocksPlanned,
-        blocksCompleted: summary.blocksCompleted,
-        workDurationMinutes: state.configWorkMinutes,
-        shortBreakMinutes: state.configShortBreakMinutes,
-        longBreakMinutes: state.configLongBreakMinutes,
-        totalFocusSecondsSpent: summary.focusSeconds,
-        totalBreakSecondsSpent: summary.breakSeconds,
-        startTime: sessionStartTime,
-        endTime: now(),
-        isCompleted: summary.blocksCompleted >= summary.totalBlocksPlanned,
-        notes,
-        satisfactionRating: rating,
-      };
-      const records = state.activeBlocks.map((b) => ({
-        sessionId: 0,
-        blockIndex: b.index,
-        title: b.title,
-        goal: b.goal,
-        durationMinutes: b.durationMinutes,
-        isCompleted: b.isCompleted,
-        completedAt: b.completedAt,
-      }));
-      const sessionId = db.insertSession(session);
-      db.insertBlocks(records.map((r) => ({ ...r, sessionId })));
+      if (!user || !state.lastSummary || !session) return;
+      const record = toSavedRecord(session, { userId: user.id, notes, rating, endTime: now() });
+      const sessionId = db.insertSession(record.session);
+      db.insertBlocks(record.blocks.map((r) => ({ ...r, sessionId })));
+      session = null;
+      activeSessionId = null;
+      awaitingSessionStart = false;
       refreshSessions();
-      set({ isSessionActive: false, isTimerRunning: false, showSummaryDialog: false, currentTab: 2 });
+      set({ isSessionActive: false, isAwaitingSessionStart: false, isTimerRunning: false, showSummaryDialog: false, currentTab: 2 });
     },
     cancelSession() {
+      if (state.isReviewing) { closeReview(); return; }
       pauseTimer();
-      set({ isSessionActive: false, isTimerRunning: false, showSummaryDialog: false, currentTab: 0 });
+      session = null;
+      activeSessionId = null;
+      awaitingSessionStart = false;
+      set({ isSessionActive: false, isAwaitingSessionStart: false, isTimerRunning: false, showSummaryDialog: false, currentTab: 0 });
     },
-    dismissSummary: () => set({ showSummaryDialog: false, isSessionActive: false }),
+    cancelSessionIfCurrent(sessionId) {
+      if (sessionId == null || sessionId !== activeSessionId || !state.isSessionActive || state.isReviewing) return false;
+      api.cancelSession();
+      return true;
+    },
+    /**
+     * Reabre una sesión guardada para verla (solo lectura) con la visión que se elija. No reanuda nada ni cambia el registro.
+     * Devuelve false si no existe o si hay una sesión en curso (no se descarta).
+     */
+    openSavedSession(sessionId) {
+      if (state.isSessionActive && !state.isReviewing) return false;
+      const saved = state.userSessions.find((s) => s.id === sessionId);
+      if (!saved) return false;
+      stopTicker();
+      session = fromSavedRecord(saved, db.blocksForSession(sessionId));
+      activeSessionId = ++sessionSequence;
+      awaitingSessionStart = false;
+      set({ ...project(session), isSessionActive: true, isReviewing: true, isAwaitingSessionStart: false, isTimerRunning: false, showSummaryDialog: false, lastSummary: null, currentTab: 1 });
+      return true;
+    },
+    closeReview,
+    dismissSummary() {
+      session = null;
+      activeSessionId = null;
+      awaitingSessionStart = false;
+      set({ showSummaryDialog: false, isSessionActive: false, isAwaitingSessionStart: false });
+    },
 
     // Perfiles
     switchActiveUser(user) {
       set({ activeUser: user, userSessions: db.sessionsForUser(user.id) });
     },
     createUser(name, colorHex, dailyGoalMinutes, emoji) {
-      const newId = db.insertUser({ id: 0, name, colorHex, dailyGoalMinutes, avatarEmoji: emoji, createdAt: now() });
-      const created = { id: newId, name, colorHex, dailyGoalMinutes, avatarEmoji: emoji, createdAt: now() };
+      const profileName = normalizeProfileName(name);
+      if (!profileName) return;
+      const newId = db.insertUser({ id: 0, name: profileName, colorHex, dailyGoalMinutes, avatarEmoji: emoji, createdAt: now(), quickTopics: [] });
+      const created = { id: newId, name: profileName, colorHex, dailyGoalMinutes, avatarEmoji: emoji, createdAt: now(), quickTopics: [] };
       set({ allUsers: db.allUsers(), activeUser: created, userSessions: db.sessionsForUser(newId) });
     },
     updateActiveUserDailyGoal(newGoalMinutes) {

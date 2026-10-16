@@ -2,9 +2,17 @@
 import React, { useState } from 'react';
 import { useVM, useEffectiveDark } from '../useStore.jsx';
 import { AlertType } from '../store.js';
-import { Icon, Surface, Card, Button, OutlinedButton, OutlinedTextField, Slider, Switch, T, alpha } from '../m3.jsx';
+import { Icon, IconButton, Surface, Card, Button, OutlinedButton, OutlinedTextField, Slider, Switch, T, alpha } from '../m3.jsx';
 import { UserSelectorBar } from '../components/CommonComponents.jsx';
+import { HorizontalScrollSection } from '../components/HorizontalScrollSection.jsx';
+import { UserTopicsDialog } from '../components/UserTopicsDialog.jsx';
+import { PaletteCard } from '../components/PaletteCard.jsx';
+import { Plegable } from '../components/Plegable.jsx';
+import { breakAfter, planTotals } from '../session/contract.js';
+import { formatMinutes } from '../session/format.js';
 import { DailyGoalSettingDialog } from '../components/DailyGoalComponents.jsx';
+import { normalizeUserTopics } from '../userTopics.js';
+import './ultrawide-config.css';
 import banner from '../assets/img_study_banner.jpg';
 import './session-config.css';
 
@@ -27,19 +35,27 @@ function SliderRow({ label, value, color, children }) {
   );
 }
 
-export function SessionConfigScreen({ onOpenUserDialog }) {
+export function SessionConfigScreen({ onOpenUserDialog, onStart }) {
   const { state, vm } = useVM();
   const {
     activeUser, configTopic: topic, configSubtopic: subtopic, configBlocksCount: blocksCount, configWorkMinutes: workMinutes,
-    configShortBreakMinutes: shortBreakMinutes, configLongBreakMinutes: longBreakMinutes, configBlockGoals: blockGoals,
+    configShortBreakMinutes: shortBreakMinutes, configLongBreakMinutes: longBreakMinutes, configLongBreakEvery: longBreakEvery, configBlockGoals: blockGoals,
     soundAlertsEnabled, vibrationAlertsEnabled,
   } = state;
   const isEffectiveDark = useEffectiveDark();
 
   const [showBlockGoalsCustomizer, setShowBlockGoalsCustomizer] = useState(false);
   const [showGoalEditor, setShowGoalEditor] = useState(false);
+  const [showTopicManager, setShowTopicManager] = useState(false);
+  const [showLongBreak, setShowLongBreak] = useState(false);
+  const plan = planTotals({ blocksCount, workMinutes, shortBreakMinutes, longBreakMinutes, longBreakEvery });
+  const longResumen = longBreakEvery === 0 ? 'Sin descanso largo' : `${longBreakMinutes} min · cada ${longBreakEvery} ${longBreakEvery === 1 ? 'bloque' : 'bloques'}`;
+  const cuantosLargos = Array.from({ length: Math.max(blocksCount - 1, 0) }, (_, i) => i + 1).filter((i) => breakAfter({ shortBreakMinutes, longBreakMinutes, longBreakEvery }, i)?.phase === 'LONG_BREAK').length;
 
   const dailyGoal = activeUser?.dailyGoalMinutes ?? 120;
+  const savedTopics = normalizeUserTopics(activeUser?.quickTopics).filter(
+    (saved) => !QuickTopicSuggestions.some((suggestion) => suggestion.toLocaleLowerCase() === saved.toLocaleLowerCase()),
+  );
 
   return (
     <>
@@ -97,10 +113,10 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         {spacer(8)}
 
-        <div className="sc-hscroll" data-tour="presets" style={{ gap: 10 }}>
+        <HorizontalScrollSection className="sc-choice-strip sc-choice-strip--presets" label="plantillas rápidas" tour="presets">
           {vm.presets.map((preset) => {
             const isSelected =
-              blocksCount === preset.blocks && workMinutes === preset.workMinutes && shortBreakMinutes === preset.shortBreakMinutes;
+              blocksCount === preset.blocks && workMinutes === preset.workMinutes && shortBreakMinutes === preset.shortBreakMinutes && longBreakMinutes === preset.longBreakMinutes && longBreakEvery === (preset.longBreakEvery ?? 4);
             return (
               <Surface
                 key={preset.name}
@@ -108,6 +124,8 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
                 radius={14}
                 color={isSelected ? 'var(--primary-container)' : 'var(--surface)'}
                 onClick={() => vm.applyPreset(preset)}
+                pressed={isSelected}
+                className="sc-preset-choice"
                 style={isSelected ? ring(2, 'var(--pomo-primary)') : hair}
               >
                 <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column' }}>
@@ -119,7 +137,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
               </Surface>
             );
           })}
-        </div>
+        </HorizontalScrollSection>
 
         {spacer(18)}
 
@@ -139,18 +157,32 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
 
         {spacer(8)}
 
-        <div className="sc-hscroll" style={{ gap: 8 }}>
-          {QuickTopicSuggestions.map((suggestion) => (
+        <div className="sc-topic-shortcuts-heading">
+          <T v="labelMedium" w="semibold" color="var(--on-surface-variant)">Temas rápidos</T>
+          <IconButton
+            testId="manage_topics_button"
+            className="sc-topic-manage-button"
+            onClick={() => setShowTopicManager(true)}
+            label="Gestionar temas guardados"
+          >
+            <Icon name="Tune" size={18} />
+          </IconButton>
+        </div>
+
+        <HorizontalScrollSection className="sc-choice-strip sc-choice-strip--topics" label="temas rápidos">
+          {[...QuickTopicSuggestions, ...savedTopics].map((suggestion, index) => (
             <Surface
-              key={suggestion}
+              key={`${suggestion}-${index}`}
               radius={20}
               color={alpha('var(--surface-variant)', 0.6)}
               onClick={() => vm.setConfig({ topic: suggestion })}
+              className="sc-topic-choice"
+              testId={`quick_topic_${suggestion.replaceAll(' ', '_')}`}
             >
               <T v="labelSmall" style={{ display: 'block', padding: '5px 10px' }}>{suggestion}</T>
             </Surface>
           ))}
-        </div>
+        </HorizontalScrollSection>
 
         {spacer(10)}
 
@@ -170,170 +202,82 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
         <div className="rs-col">
         <Card tour="sliders" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
           <div style={{ padding: 16 }}>
+            <div className="sc-resumen" role="status" aria-live="polite" data-testid="plan_summary">
+              <div className="sc-resumen-dato">
+                <T v="labelSmall" color="var(--on-surface-variant)">Horas de estudio</T>
+                <span data-testid="plan_study"><T v="titleMedium" w="bold">{formatMinutes(plan.studyMinutes)}</T></span>
+              </div>
+              <span className="sc-resumen-sep" aria-hidden="true">/</span>
+              <div className="sc-resumen-dato">
+                <T v="labelSmall" color="var(--on-surface-variant)">Horas totales</T>
+                <span data-testid="plan_total"><T v="titleMedium" w="bold">{formatMinutes(plan.totalMinutes)}</T></span>
+              </div>
+            </div>
+            <T v="bodySmall" color="var(--on-surface-variant)" style={{ display: 'block', marginTop: 4 }}>
+              {plan.breakMinutes > 0 ? `Incluye ${formatMinutes(plan.breakMinutes)} de descanso.` : 'Sin descansos entre bloques.'}
+            </T>
+
+            {spacer(14)}
+
             <SliderRow
               label="Número de bloques de estudio"
               value={`${blocksCount} ${blocksCount === 1 ? 'bloque' : 'bloques'}`}
               color="var(--pomo-primary)"
             >
-              <Slider value={blocksCount} onChange={(v) => vm.setConfig({ blocksCount: Math.trunc(v) })} min={1} max={8} steps={6} testId="blocks_slider" />
+              <Slider value={blocksCount} onChange={(v) => vm.setConfig({ blocksCount: Math.trunc(v) })} min={1} max={8} steps={6} testId="blocks_slider" label="Número de bloques de estudio" />
             </SliderRow>
 
             {spacer(8)}
 
             <SliderRow label="Duración de cada bloque (Enfoque)" value={`${workMinutes} min`} color="var(--pomo-primary)">
-              <Slider value={workMinutes} onChange={(v) => vm.setConfig({ workMinutes: Math.trunc(v) })} min={10} max={60} steps={9} testId="work_duration_slider" />
+              <Slider value={workMinutes} onChange={(v) => vm.setConfig({ workMinutes: Math.trunc(v) })} min={10} max={60} steps={9} testId="work_duration_slider" label="Duración de cada bloque de enfoque, en minutos" />
             </SliderRow>
 
             {spacer(8)}
 
-            <SliderRow label="Descanso corto" value={`${shortBreakMinutes} min`} color="var(--break-green)">
-              <Slider value={shortBreakMinutes} onChange={(v) => vm.setConfig({ shortBreakMinutes: Math.trunc(v) })} min={2} max={15} steps={12} />
+            <SliderRow label="Descanso corto" value={shortBreakMinutes === 0 ? 'Sin descanso' : `${shortBreakMinutes} min`} color="var(--break-green)">
+              <Slider value={shortBreakMinutes} onChange={(v) => vm.setConfig({ shortBreakMinutes: Math.trunc(v) })} min={0} max={15} steps={14} testId="short_break_slider" label="Descanso corto, en minutos (0 = sin descanso)" />
             </SliderRow>
 
             {spacer(8)}
 
-            <SliderRow label="Descanso largo (cada 4 bloques)" value={`${longBreakMinutes} min`} color="#0284C7">
-              <Slider value={longBreakMinutes} onChange={(v) => vm.setConfig({ longBreakMinutes: Math.trunc(v) })} min={10} max={30} steps={3} />
-            </SliderRow>
+            <button type="button" className="sc-sub" aria-expanded={showLongBreak} aria-controls="sc-largo" onClick={() => setShowLongBreak(!showLongBreak)} data-testid="long_break_toggle">
+              <span className="sc-sub-texto">
+                <T v="bodyMedium" w="semibold">Descanso largo</T>
+                <T v="bodySmall" color="var(--on-surface-variant)">{longResumen}</T>
+              </span>
+              <Icon name={showLongBreak ? 'ExpandLess' : 'ExpandMore'} />
+            </button>
+
+            <div id="sc-largo" className={`sc-expand${showLongBreak ? ' open' : ''}`}>
+              <div>
+                <div style={{ paddingTop: 10 }}>
+                  <SliderRow
+                    label="Cada cuántos bloques"
+                    value={longBreakEvery === 0 ? 'Nunca' : `cada ${longBreakEvery}`}
+                    color="#0284C7"
+                  >
+                    <Slider value={longBreakEvery} onChange={(v) => vm.setConfig({ longBreakEvery: Math.trunc(v) })} min={0} max={8} steps={7} testId="long_break_every_slider" label="Descanso largo cada cuántos bloques (0 = sin descanso largo)" />
+                  </SliderRow>
+                  <T v="bodySmall" color="var(--on-surface-variant)" style={{ display: 'block', marginTop: 2 }}>
+                    {longBreakEvery === 0 ? '0 significa que no habrá descanso largo.' : cuantosLargos === 0 ? `Con ${blocksCount} ${blocksCount === 1 ? 'bloque' : 'bloques'} no llegarás a un descanso largo (no hay descanso tras el último bloque).` : `Con ${blocksCount} ${blocksCount === 1 ? 'bloque' : 'bloques'} habrá ${cuantosLargos} ${cuantosLargos === 1 ? 'descanso largo' : 'descansos largos'}.`}
+                  </T>
+
+                  {longBreakEvery > 0 && (
+                    <>
+                      {spacer(8)}
+                      <SliderRow label="Duración del descanso largo" value={`${longBreakMinutes} min`} color="#0284C7">
+                        <Slider value={longBreakMinutes} onChange={(v) => vm.setConfig({ longBreakMinutes: Math.trunc(v) })} min={5} max={45} steps={7} testId="long_break_slider" label="Duración del descanso largo, en minutos" />
+                      </SliderRow>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </Card>
 
         {spacer(16)}
-
-        <Card testId="theme_switch_card" tour="prefs" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: 16, boxSizing: 'border-box' }}>
-            <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  width: 38, height: 38, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isEffectiveDark ? alpha('#6366F1', 0.22) : alpha('var(--pomo-accent-gold)', 0.2),
-                }}
-              >
-                <Icon name={isEffectiveDark ? 'DarkMode' : 'LightMode'} size={22} tint={isEffectiveDark ? '#A5B4FC' : 'var(--pomo-accent-gold)'} />
-              </div>
-
-              {hspacer(12)}
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <T v="titleSmall" w="bold">{isEffectiveDark ? 'Tema Oscuro (Modo Nocturno)' : 'Tema Claro'}</T>
-                <T v="bodySmall" color="var(--on-surface-variant)">
-                  {isEffectiveDark ? 'Confort visual en entornos con poca luz' : 'Ideal para estudiar con luz ambiental alta'}
-                </T>
-              </div>
-            </div>
-
-            <Switch
-              testId="dark_mode_switch"
-              checked={isEffectiveDark}
-              onChange={(v) => vm.setDarkTheme(v)}
-              thumbIcon={isEffectiveDark ? 'DarkMode' : 'LightMode'}
-              colors={{
-                checkedThumb: '#A5B4FC',
-                checkedTrack: '#4338CA',
-                uncheckedThumb: 'var(--pomo-accent-gold)',
-                uncheckedTrack: 'var(--surface-variant)',
-              }}
-            />
-          </div>
-        </Card>
-
-        {spacer(14)}
-
-        <Card testId="alerts_settings_card" tour="prefs" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
-          <div style={{ padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-              <div
-                style={{
-                  width: 36, height: 36, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: alpha('var(--pomo-accent-gold)', 0.18),
-                }}
-              >
-                <Icon name="NotificationsActive" size={20} tint="var(--pomo-accent-gold)" />
-              </div>
-
-              {hspacer(12)}
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <T v="titleSmall" w="bold">Alertas de Sonido y Vibración</T>
-                <T v="bodySmall" color="var(--on-surface-variant)">Avisa cuando inicia o termina cada bloque</T>
-              </div>
-            </div>
-
-            {spacer(14)}
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Icon
-                  name={soundAlertsEnabled ? 'VolumeUp' : 'NotificationsOff'}
-                  size={20}
-                  tint={soundAlertsEnabled ? 'var(--pomo-primary)' : 'var(--outline)'}
-                />
-                {hspacer(10)}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <T v="bodyMedium" w="semibold">Sonidos de notificación</T>
-                  <T v="bodySmall" color="var(--on-surface-variant)">Campanas al iniciar y terminar el tiempo</T>
-                </div>
-              </div>
-
-              <Switch
-                testId="sound_alerts_switch"
-                checked={soundAlertsEnabled}
-                onChange={(v) => vm.setSoundAlerts(v)}
-                colors={{ checkedThumb: '#FFFFFF', checkedTrack: 'var(--pomo-primary)' }}
-              />
-            </div>
-
-            {spacer(10)}
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Icon name="Vibration" size={20} tint={vibrationAlertsEnabled ? 'var(--pomo-primary)' : 'var(--outline)'} />
-                {hspacer(10)}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <T v="bodyMedium" w="semibold">Vibración háptica</T>
-                  <T v="bodySmall" color="var(--on-surface-variant)">Patrones de pulso distintivos</T>
-                </div>
-              </div>
-
-              <Switch
-                testId="vibration_alerts_switch"
-                checked={vibrationAlertsEnabled}
-                onChange={(v) => vm.setVibrationAlerts(v)}
-                colors={{ checkedThumb: '#FFFFFF', checkedTrack: 'var(--pomo-primary)' }}
-              />
-            </div>
-
-            {spacer(12)}
-
-            <T v="labelSmall" w="semibold" color="var(--on-surface-variant)" style={{ display: 'block' }}>
-              Probar alertas en este dispositivo:
-            </T>
-
-            {spacer(6)}
-
-            <div style={{ display: 'flex', gap: 8, width: '100%' }}>
-              <OutlinedButton
-                testId="test_sound_start_button"
-                onClick={() => vm.testAlert(AlertType.BLOCK_BEGINS)}
-                radius={10}
-                style={{ flex: 1, minWidth: 0 }}
-              >
-                <span style={{ fontSize: 12 }}>🔔 Inicio de bloque</span>
-              </OutlinedButton>
-
-              <OutlinedButton
-                testId="test_sound_end_button"
-                onClick={() => vm.testAlert(AlertType.BLOCK_ENDS)}
-                radius={10}
-                style={{ flex: 1, minWidth: 0 }}
-              >
-                <span style={{ fontSize: 12 }}>⏰ Fin de bloque</span>
-              </OutlinedButton>
-            </div>
-          </div>
-        </Card>
-
-        {spacer(14)}
 
         <Surface
           tour="blockgoals"
@@ -369,12 +313,148 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
           </div>
         </div>
 
+        {spacer(16)}
+
+        <Card testId="theme_switch_card" tour="prefs" color="var(--surface)" radius={16} style={{ width: '100%', ...hair }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: 16, boxSizing: 'border-box' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  width: 38, height: 38, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: isEffectiveDark ? alpha('#6366F1', 0.22) : alpha('var(--pomo-accent-gold)', 0.2),
+                }}
+              >
+                <Icon name={isEffectiveDark ? 'DarkMode' : 'LightMode'} size={22} tint={isEffectiveDark ? '#A5B4FC' : 'var(--pomo-accent-gold)'} />
+              </div>
+
+              {hspacer(12)}
+
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <T v="titleSmall" w="bold">{isEffectiveDark ? 'Tema Oscuro (Modo Nocturno)' : 'Tema Claro'}</T>
+                <T v="bodySmall" color="var(--on-surface-variant)">
+                  {isEffectiveDark ? 'Confort visual en entornos con poca luz' : 'Ideal para estudiar con luz ambiental alta'}
+                </T>
+              </div>
+            </div>
+
+            <Switch
+              testId="dark_mode_switch"
+              label="Tema oscuro"
+              checked={isEffectiveDark}
+              onChange={(v) => vm.setDarkTheme(v)}
+              thumbIcon={isEffectiveDark ? 'DarkMode' : 'LightMode'}
+              colors={{
+                checkedThumb: '#A5B4FC',
+                checkedTrack: '#4338CA',
+                uncheckedThumb: 'var(--pomo-accent-gold)',
+                uncheckedTrack: 'var(--surface-variant)',
+              }}
+            />
+          </div>
+        </Card>
+
+        {spacer(14)}
+
+        <PaletteCard />
+
+        {spacer(14)}
+
+        <Plegable
+          testId="alerts_settings_card"
+          toggleTestId="alerts_toggle"
+          tour="prefs"
+          titulo="Alertas de Sonido y Vibración"
+          resumen={`Sonido ${soundAlertsEnabled ? 'activado' : 'desactivado'} · Vibración ${vibrationAlertsEnabled ? 'activada' : 'desactivada'}`}
+          icono={
+            <div
+              style={{
+                width: 36, height: 36, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: alpha('var(--pomo-accent-gold)', 0.18),
+              }}
+            >
+              <Icon name="NotificationsActive" size={20} tint="var(--pomo-accent-gold)" />
+            </div>
+          }
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Icon
+                  name={soundAlertsEnabled ? 'VolumeUp' : 'NotificationsOff'}
+                  size={20}
+                  tint={soundAlertsEnabled ? 'var(--pomo-primary)' : 'var(--outline)'}
+                />
+                {hspacer(10)}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <T v="bodyMedium" w="semibold">Sonidos de notificación</T>
+                  <T v="bodySmall" color="var(--on-surface-variant)">Campanas al iniciar y terminar el tiempo</T>
+                </div>
+              </div>
+
+              <Switch
+                testId="sound_alerts_switch"
+                label="Alertas de sonido"
+                checked={soundAlertsEnabled}
+                onChange={(v) => vm.setSoundAlerts(v)}
+                colors={{ checkedThumb: '#FFFFFF', checkedTrack: 'var(--pomo-primary)' }}
+              />
+            </div>
+
+            {spacer(10)}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Icon name="Vibration" size={20} tint={vibrationAlertsEnabled ? 'var(--pomo-primary)' : 'var(--outline)'} />
+                {hspacer(10)}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <T v="bodyMedium" w="semibold">Vibración háptica</T>
+                  <T v="bodySmall" color="var(--on-surface-variant)">Patrones de pulso distintivos</T>
+                </div>
+              </div>
+
+              <Switch
+                testId="vibration_alerts_switch"
+                label="Alertas de vibración"
+                checked={vibrationAlertsEnabled}
+                onChange={(v) => vm.setVibrationAlerts(v)}
+                colors={{ checkedThumb: '#FFFFFF', checkedTrack: 'var(--pomo-primary)' }}
+              />
+            </div>
+
+            {spacer(12)}
+
+            <T v="labelSmall" w="semibold" color="var(--on-surface-variant)" style={{ display: 'block' }}>
+              Probar alertas en este dispositivo:
+            </T>
+
+            {spacer(6)}
+
+            <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+              <OutlinedButton
+                testId="test_sound_start_button"
+                onClick={() => vm.testAlert(AlertType.BLOCK_BEGINS)}
+                radius={10}
+                style={{ flex: 1, minWidth: 0 }}
+              >
+                <span style={{ fontSize: 12 }}>🔔 Inicio de bloque</span>
+              </OutlinedButton>
+
+              <OutlinedButton
+                testId="test_sound_end_button"
+                onClick={() => vm.testAlert(AlertType.BLOCK_ENDS)}
+                radius={10}
+                style={{ flex: 1, minWidth: 0 }}
+              >
+                <span style={{ fontSize: 12 }}>⏰ Fin de bloque</span>
+              </OutlinedButton>
+            </div>
+        </Plegable>
+
         {spacer(24)}
 
         <Button
           testId="start_session_button"
           tour="start"
-          onClick={() => vm.startSession()}
+          onClick={() => (onStart ? onStart() : vm.startSession())}
           color="var(--pomo-primary)"
           radius={16}
           height={54}
@@ -382,7 +462,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
           iconSize={24}
           style={{ width: '100%' }}
         >
-          <T v="titleMedium" w="bold">{`Iniciar Sesión de Estudio (${blocksCount * workMinutes} min)`}</T>
+          <T v="titleMedium" w="bold">{`Iniciar Sesión de Estudio (${plan.studyMinutes} min)`}</T>
         </Button>
 
         {spacer(28)}
@@ -397,6 +477,7 @@ export function SessionConfigScreen({ onOpenUserDialog }) {
           onDismiss={() => setShowGoalEditor(false)}
         />
       )}
+      {showTopicManager && <UserTopicsDialog onDismiss={() => setShowTopicManager(false)} />}
     </>
   );
 }

@@ -1,0 +1,128 @@
+/* Visión Investigación. Colores propios de la visión, acotados a .vi (variables --vi-*, de colores.js).
+   Claro/oscuro sigue al tema de la app. Los tamaños usan em: el tamaño del texto se ajusta en .vi. */
+.vi { font-size: 1rem; box-sizing: border-box; background: var(--vi-fondo); color: var(--vi-texto); border-radius: 16px; padding: .25em; line-height: 1.5; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+.vi[data-tamano='grande'] { font-size: 1.2rem; }
+.vi[data-tamano='enorme'] { font-size: 1.4rem; }
+.vi *, .vi *::before, .vi *::after { box-sizing: border-box; }
+.vi[data-mov='reducir'] * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+.vi .vi-pantalla { max-width: 40em; margin: 0 auto; padding: 1em; display: flex; flex-direction: column; gap: 1em; }
+.vi .vi-barra { display: flex; align-items: center; justify-content: space-between; gap: .5em 1em; flex-wrap: wrap; }
+.vi h1 { font-size: 1.5em; margin: 0; }
+.vi h2 { font-size: 1.15em; margin: 0 0 .5em; }
+.vi h3 { font-size: 1em; margin: 1em 0 .25em; }
+.vi p { margin: 0 0 .5em; }
+.vi .vi-tarjeta { background: var(--vi-superficie); border: 1px solid var(--vi-borde); border-radius: 12px; padding: 1em; }
+.vi .vi-fase-nombre { text-align: center; font-size: 1.1em; margin-bottom: .75em; min-height: 3.2em; }
+.vi .vi-fase-etiqueta { font-weight: 700; }
+.vi .vi-fase-bloque { color: var(--vi-suave); }
+.vi .vi-fase-enfoque .vi-fase-etiqueta { color: var(--vi-enfoque); }
+.vi .vi-fase-descanso .vi-fase-etiqueta { color: var(--vi-descanso); }
+.vi .vi-anillo { position: relative; width: min(16em, 100%); aspect-ratio: 1; margin: 0 auto; }
+.vi .vi-anillo svg { width: 100%; height: 100%; display: block; }
+.vi .vi-pista { fill: none; stroke: var(--vi-anillo); stroke-width: 14; }
+.vi .vi-avance { fill: none; stroke-width: 14; stroke-linecap: butt; }
+.vi .vi-fase-enfoque .vi-avance { stroke: var(--vi-enfoque); }
+.vi .vi-fase-descanso .vi-avance { stroke: var(--vi-descanso); }
+.vi .vi-anillo-centro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25em; }
+.vi .vi-digitos { font-size: min(2.75em, 15vw); font-weight: 700; font-variant-numeric: tabular-nums; }
+.vi .vi-estado-texto { color: var(--vi-suave); font-size: 1em; }
+.vi .vi-solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.vi .vi-acciones { display: flex; justify-content: center; gap: .75em; margin-top: 1em; flex-wrap: wrap; }
+.vi .vi-acciones.vi-secundarias { margin-top: .75em; gap: .5em; }
+.vi .vi-acciones.vi-secundarias button { padding-inline: .75em; }
+.vi button { font: inherit; cursor: pointer; border-radius: 10px; min-height: 2.75em; padding: .5em 1em; border: 2px solid var(--vi-borde); background: var(--vi-superficie); color: var(--vi-texto); }
+.vi button:disabled { cursor: not-allowed; color: var(--vi-suave); border-style: dashed; }
+.vi .vi-btn-principal { min-width: min(14em, 100%); max-width: 100%; min-height: 3.25em; font-size: 1.15em; font-weight: 700; border-color: transparent; }
+.vi .vi-fase-enfoque .vi-btn-principal { background: var(--vi-enfoque); color: var(--vi-enfoqueSobre); }
+.vi .vi-fase-descanso .vi-btn-principal { background: var(--vi-descanso); color: var(--vi-descansoSobre); }
+.vi .vi-btn-paso { min-width: 2.75em; padding: .25em; font-size: 1.25em; font-weight: 700; }
+.vi :focus-visible { outline: 3px solid var(--vi-foco); outline-offset: 2px; }
+.vi .vi-estado-vivo { min-height: 3.5em; }
+.vi .vi-aviso,
+.vi .vi-mensaje { border-radius: 10px; padding: .75em 1em; margin: 0; overflow-wrap: anywhere; }
+.vi .vi-aviso { background: var(--vi-avisoFondo); color: var(--vi-aviso); border: 1px solid var(--vi-aviso); }
+.vi .vi-mensaje { background: var(--vi-superficie); border: 1px solid var(--vi-borde); }
+.vi label.vi-etiqueta,
+.vi .vi-etiqueta { font-weight: 600; display: block; }
+.vi input[type='text'] { width: 100%; font: inherit; padding: .6em .75em; margin-top: .35em; border: 2px solid var(--vi-borde); border-radius: 10px; background: var(--vi-fondo); color: var(--vi-texto); min-height: 2.75em; }
+.vi input::placeholder { color: var(--vi-suave); opacity: 1; }
+.vi .vi-secuencia { list-style: none; margin: 0; padding: 0; }
+.vi .vi-secuencia li { display: flex; justify-content: space-between; padding: .5em .5em; border-bottom: 1px solid var(--vi-anillo); }
+.vi .vi-secuencia li.vi-actual { font-weight: 700; border-left: 4px solid var(--vi-texto); background: var(--vi-fondo); }
+.vi .vi-secuencia li.vi-hecha { color: var(--vi-suave); }
+.vi .vi-resumen-seq,
+.vi .vi-compacto { color: var(--vi-suave); margin: .75em 0 0; }
+.vi .vi-compacto { text-align: center; }
+.vi .vi-nota { color: var(--vi-suave); }
+.vi .vi-grupo { background: var(--vi-superficie); border: 1px solid var(--vi-borde); border-radius: 12px; padding: 1em; }
+.vi .vi-fila { border: 0; padding: 0; margin: 0 0 1em; min-width: 0; }
+.vi .vi-fila:last-child { margin-bottom: 0; }
+.vi .vi-fila-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 1em; flex-wrap: wrap; }
+.vi .vi-paso { display: flex; align-items: center; gap: .5em; max-width: 100%; }
+.vi .vi-paso output { min-width: min(5.5em, 22vw); text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.vi .vi-paso small { font-weight: 400; color: var(--vi-suave); }
+.vi .vi-ayuda { color: var(--vi-suave); font-size: .95em; margin: .25em 0 0; }
+.vi .vi-rango { white-space: nowrap; }
+.vi .vi-opciones { display: flex; flex-wrap: wrap; gap: .5em; margin-top: .35em; }
+.vi .vi-opcion { display: inline-flex; align-items: center; gap: .4em; border: 2px solid var(--vi-borde); border-radius: 10px; padding: .45em .75em; min-height: 2.75em; cursor: pointer; }
+.vi .vi-opcion:has(input:checked),
+.vi .vi-perfil.vi-activo { border-color: var(--vi-texto); background: var(--vi-fondo); font-weight: 600; }
+.vi .vi-perfiles { display: grid; gap: .5em; margin-top: .35em; }
+.vi .vi-perfil { display: grid; grid-template-columns: auto 1fr; column-gap: .6em; border: 2px solid var(--vi-borde); border-radius: 10px; padding: .6em .75em; cursor: pointer; }
+.vi .vi-perfil input { grid-row: span 2; align-self: center; }
+.vi .vi-perfil-nombre { font-weight: 700; }
+.vi .vi-perfil-resumen { color: var(--vi-suave); font-size: .95em; }
+.vi input[type='radio'],
+.vi input[type='checkbox'] { width: 1.25em; height: 1.25em; accent-color: var(--vi-enfoque); }
+.vi .vi-interruptor { cursor: pointer; min-height: 2.75em; }
+.vi .vi-atajos { margin: 0; padding-left: 1.25em; }
+.vi kbd { border: 1px solid var(--vi-borde); border-radius: 6px; padding: 0 .4em; background: var(--vi-fondo); font-family: inherit; }
+/* Se oculta la ayuda de teclado en superficies táctiles, no los atajos para teclados conectados. */
+@media (hover: none) and (pointer: coarse) {
+  .vi .vi-atajos { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vi * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+.vi .vi-pausado .vi-pista { stroke-dasharray: 3 9; }
+.vi .vi-pausado .vi-avance { stroke: var(--vi-suave) !important; }
+.vi .vi-icono-pausa { letter-spacing: -.15em; }
+.vi h2.vi-sub { font-size: 1em; margin: 1em 0 .35em; }
+.vi .vi-pasos { list-style: none; margin: 0 0 .5em; padding: 0; }
+.vi .vi-pasos li { display: flex; align-items: center; justify-content: space-between; gap: .5em; padding: .35em 0; border-bottom: 1px solid var(--vi-anillo); }
+.vi .vi-pasos label { display: flex; align-items: center; gap: .5em; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.vi .vi-pasos label.vi-hecho span { text-decoration: line-through; color: var(--vi-suave); }
+.vi .vi-btn-quitar { min-height: 2.5em; padding: .25em .6em; }
+.vi .vi-nuevo-paso { display: flex; flex-wrap: wrap; gap: .5em; }
+.vi .vi-nuevo-paso input { margin-top: 0; flex: 1 1 10em; min-width: 0; }
+.vi .vi-indice { display: flex; flex-wrap: wrap; gap: .5em 1em; }
+.vi .vi-indice a { color: var(--vi-enfoque); font-weight: 600; padding: .4em 0; min-height: 2.75em; min-width: 2.75em; justify-content: center; display: inline-flex; align-items: center; }
+.vi .vi-grupo h2 { scroll-margin-top: 1em; }
+.vi fieldset:disabled .vi-opcion { border-style: dashed; color: var(--vi-suave); cursor: not-allowed; }
+@media (max-height: 480px) and (orientation: landscape) {
+  .vi .vi-tarjeta[aria-label="Sesión"] { display: grid; grid-template-columns: minmax(0, min(11em, 50vh)) 1fr; column-gap: 1.25em; align-items: center; }
+  .vi .vi-tarjeta[aria-label="Sesión"] > .vi-anillo { grid-column: 1; grid-row: 1 / span 4; width: 100%; align-self: center; }
+  .vi .vi-tarjeta[aria-label="Sesión"] > :not(.vi-anillo) { grid-column: 2; }
+  .vi .vi-tarjeta[aria-label="Sesión"] .vi-fase-nombre { min-height: 0; margin-bottom: .25em; }
+  .vi .vi-tarjeta[aria-label="Sesión"] .vi-acciones { margin-top: .5em; }
+  .vi .vi-tarjeta[aria-label="Sesión"] .vi-acciones.vi-secundarias { margin-top: .4em; gap: .35em; flex-wrap: nowrap; }
+  .vi .vi-tarjeta[aria-label="Sesión"] .vi-acciones.vi-secundarias button { padding-inline: .4em; font-size: .9em; white-space: nowrap; }
+  .vi .vi-digitos { font-size: min(2em, 8.5vh); }
+  .vi h1 { font-size: 1.25em; }
+  .vi .vi-pantalla { padding-block: .5em; gap: .5em; }
+  .vi .vi-tarjeta[aria-label="Sesión"] { padding-block: .6em; }
+  .vi .vi-anillo-centro { gap: 0; }
+  .vi .vi-anillo-centro .vi-estado-texto { font-size: max(.8em, min(1em, 4.2vh)); white-space: nowrap; }
+}
+.vi .vi-nota-permiso { margin: .25em 0 0; color: var(--vi-suave); font-size: .95em; }
+.vi .vi-btn-volver { order: -1; }
+.vi .vi-sesion-aparte { border: 1px solid var(--vi-borde); border-radius: .6em; padding: .6em .9em; margin: .75em 0; background: var(--vi-superficie); }
+.vi .vi-sesion-aparte p { margin: .15em 0; }
+.vi .vi-sesion-aparte-texto,
+.vi .vi-sesion-aparte-tiempo { color: var(--vi-suave); }
+.vi .vi-grid { display: flex; flex-direction: column; gap: 1em; }
+.vi .vi-col { display: flex; flex-direction: column; gap: 1em; min-width: 0; }
+@media (min-width: 900px) {
+  .vi .vi-pantalla { max-width: 64em; }
+  .vi .vi-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+}

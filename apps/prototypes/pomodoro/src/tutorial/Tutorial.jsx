@@ -41,6 +41,7 @@ export default function Tutorial({ onClose }) {
   const cardRef = useRef(null);
   const closedRef = useRef(false);
   const demoRef = useRef(false); // ¿el tutorial inició una sesión de muestra?
+  const demoSessionIdRef = useRef(null);
   const initialTab = useRef(state.currentTab);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -52,7 +53,7 @@ export default function Tutorial({ onClose }) {
     const { soundAlertsEnabled, vibrationAlertsEnabled } = vm.getState();
     vm.setSoundAlerts(false);
     vm.setVibrationAlerts(false);
-    vm.startSession();
+    demoSessionIdRef.current = vm.startSession();
     vm.pauseTimer();
     vm.setSoundAlerts(soundAlertsEnabled);
     vm.setVibrationAlerts(vibrationAlertsEnabled);
@@ -62,7 +63,9 @@ export default function Tutorial({ onClose }) {
   const stopDemo = useCallback(() => {
     if (!demoRef.current) return;
     demoRef.current = false;
-    vm.cancelSession();
+    const demoSessionId = demoSessionIdRef.current;
+    demoSessionIdRef.current = null;
+    if (demoSessionId !== null) vm.cancelSessionIfCurrent(demoSessionId);
   }, [vm]);
 
   // Deja la app como estaba: sin sesión de muestra y en la pestaña en que se abrió el tutorial.
